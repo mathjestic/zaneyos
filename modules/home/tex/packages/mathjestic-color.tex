@@ -1,0 +1,59 @@
+\ProvidesFile{mathjestic-color.tex}
+\ExplSyntaxOn
+
+\cs_new_protected:Npn \mathjestic_color_set_from_tl:n #1
+  {
+    % keep an original for warnings (optional)
+    \tl_set:Nn \l_tmpb_tl {#1}
+
+    % normalize: trim spaces, lowercase
+    \tl_set:Nx \l_tmpa_tl { \tl_lower_case:n { \tl_trim_spaces:n {#1} } }
+
+    % % strip optional surrounding parentheses: (3) -> 3
+    % \regex_replace_once:nnN { \A\(\s* } {} \l_tmpa_tl
+    % \regex_replace_once:nnN { \s*\)\Z } {} \l_tmpa_tl
+
+    % empty -> default = azuria
+    \tl_if_blank:VTF \l_tmpa_tl
+      { \PassOptionsToPackage{color = azuria}{mathjesticcolor} }
+      {
+        % numbers 1..7 -> map to your list
+        \str_case:VnF \l_tmpa_tl
+          {
+            {1} { \PassOptionsToPackage{color = indigo}{mathjesticcolor} }
+            {2} { \PassOptionsToPackage{color = azuria}{mathjesticcolor} }
+            {3} { \PassOptionsToPackage{color = nifle}{mathjesticcolor} }
+            {4} { \PassOptionsToPackage{color = botany}{mathjesticcolor} }
+            {5} { \PassOptionsToPackage{color = sunset}{mathjesticcolor} }
+            {6} { \PassOptionsToPackage{color = chili}{mathjesticcolor} }
+            {7} { \PassOptionsToPackage{color = viola}{mathjesticcolor} }
+          }
+          {
+            % if it's numeric but not 1..7 -> warn + default
+            \regex_match:nnTF { \A[0-9]+\Z } { \l_tmpa_tl }
+              {
+                \PackageWarning{mathjesticpbook}
+                  {Unknown numeric color '~\l_tmpb_tl~'. Using default 'azuria'.}
+                \PassOptionsToPackage{color = azuria}{mathjesticcolor}
+              }
+              {
+                % otherwise treat as a theme name; let subpkg validate
+                \PassOptionsToPackage{color = \tl_use:N \l_tmpa_tl}{mathjesticcolor}
+              }
+          }
+      }
+  }
+
+% Letters-only wrapper (safe in key bodies)
+\cs_new_protected:Npn \mathjesticColorSetFromTL #1
+  { \mathjestic_color_set_from_tl:n {#1} }
+
+\keys_define:nn { mathjestic }
+  {
+    color .code:n       = { \mathjesticColorSetFromTL {#1} },
+    color-theme .meta:n = { color = #1 },
+    color theme .meta:n = { color = #1 },
+    colortheme  .meta:n = { color = #1 },
+  }
+
+\ExplSyntaxOff

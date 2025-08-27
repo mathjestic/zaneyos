@@ -30,8 +30,8 @@ in {
       source = ../../../wallpapers;
       recursive = true;
     };
-    ".face.icon".source = ./face.jpg;
-    ".config/face.jpg".source = ./face.jpg;
+    ".face.icon".source = ../../../wallpapers/darkredforest.jpg; # initially ./face.jpg
+    ".config/face.jpg".source = ../../../wallpapers/darkredforest.jpg; # initially ./face.jpg
   };
   wayland.windowManager.hyprland = {
     enable = true;
@@ -167,8 +167,9 @@ in {
     };
 
     extraConfig = "
-      monitor=,preferred,auto,auto
-      monitor=Virtual-1,1920x1080@60,auto,1
+      monitor=eDP-1,1920x1080@144.14900,0x0,1
+      monitor=HDMI-A-1,2560x1440@143.85,1920x-360,1
+      # monitor=Virtual-1,1920x1080@60,auto,1
       ${extraMonitorSettings}
       # To enable blur on waybar uncomment the line below
       # Thanks to SchotjeChrisman

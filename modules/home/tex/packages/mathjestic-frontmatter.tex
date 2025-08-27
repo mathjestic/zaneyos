@@ -1,0 +1,15 @@
+\ProvidesFile{mathjestic-frontmatter.tex}
+\ExplSyntaxOn
+
+\cs_new_protected:Npn \mathjestic_print_frontmatter:
+  {
+    \bool_if:NT \g_mathjestic_print_cover_bool { \makecover \clearpage }
+    \bool_if:NT \g_mathjestic_print_toc_bool   { \tableofcontents \clearpage }
+    \bool_if:NT \g_mathjestic_print_preface_bool
+      { \mathjestic_print_preface_block: }
+  }
+
+\cs_new_protected:Npn \mathjesticPrintFrontmatter
+  { \mathjestic_print_frontmatter: }
+
+\ExplSyntaxOff

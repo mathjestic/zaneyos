@@ -1,0 +1,83 @@
+\ProvidesFile{mathjestic-watermark.tex}
+\ExplSyntaxOn
+
+% --------------------------
+% Option & state
+% --------------------------
+\bool_new:N \g_mj_watermark_bool
+\bool_gset_false:N \g_mj_watermark_bool
+
+% Presence-only option: [watermark]
+\keys_define:nn { mathjestic }
+  {
+    watermark .code:n = { \bool_gset_true:N \g_mj_watermark_bool },
+  }
+
+% --------------------------
+% Dependencies
+% --------------------------
+\RequirePackage{graphicx}
+\RequirePackage{tikz}
+\RequirePackage{tikzpagenodes} % current page nodes
+
+% --------------------------
+% Config (defaults + setters)
+% --------------------------
+\tl_new:N  \g_mj_watermark_file_tl
+\tl_gset:Nn \g_mj_watermark_file_tl { mathjestic-\mycolortheme.pdf }
+
+\dim_new:N \g_mj_watermark_width_dim
+\dim_gset:Nn \g_mj_watermark_width_dim { .6\paperwidth }
+
+\fp_new:N \g_mj_watermark_opacity_fp
+\fp_gset:Nn \g_mj_watermark_opacity_fp { 0.08 }
+
+% Optional: suppress next page only
+\bool_new:N \g_mj_watermark_suppress_next_bool
+\bool_gset_false:N \g_mj_watermark_suppress_next_bool
+
+% User-facing helpers
+\NewDocumentCommand \SetWatermarkFile     { m } { \tl_gset:Nn  \g_mj_watermark_file_tl {#1} }
+\NewDocumentCommand \SetWatermarkWidth    { m } { \dim_gset:Nn \g_mj_watermark_width_dim {#1} }
+\NewDocumentCommand \SetWatermarkOpacity  { m } { \fp_gset:Nn  \g_mj_watermark_opacity_fp {#1} }
+\NewDocumentCommand \WatermarkOn          {   } { \bool_gset_true:N  \g_mj_watermark_bool }
+\NewDocumentCommand \WatermarkOff         {   } { \bool_gset_false:N \g_mj_watermark_bool }
+\NewDocumentCommand \NoWatermarkThisPage  {   } { \bool_gset_true:N  \g_mj_watermark_suppress_next_bool }
+
+% --------------------------
+% Shipout hook (draw behind content)
+% --------------------------
+\cs_new_protected:Npn \mj_watermark_shipout:
+  {
+    % one-shot suppression
+    \bool_if:NTF \g_mj_watermark_suppress_next_bool
+      { \bool_gset_false:N \g_mj_watermark_suppress_next_bool }
+      {
+        \bool_if:NT \g_mj_watermark_bool
+          {
+            \begin{tikzpicture}[remember~picture,overlay]
+              \node[opacity=\fp_use:N \g_mj_watermark_opacity_fp]
+                   at (current~page.center)
+                   {\includegraphics[width=\dim_use:N \g_mj_watermark_width_dim]
+                                   {\tl_use:N \g_mj_watermark_file_tl}};
+            \end{tikzpicture}
+          }
+      }
+  }
+\AddToHook{shipout/background}{\mj_watermark_shipout:}
+
+% Optional: one-time sanity check & console note
+\AtBeginDocument{
+  \bool_if:NT \g_mj_watermark_bool
+    {
+      \file_if_exist:nF { \tl_use:N \g_mj_watermark_file_tl }
+        {
+          \PackageWarning{mathjestic}
+            {Watermark file `\tl_use:N \g_mj_watermark_file_tl' not found. Disabling watermark.}
+          \bool_gset_false:N \g_mj_watermark_bool
+        }
+    }
+  \iow_term:x { [mathjestic] watermark=\bool_if:NTF \g_mj_watermark_bool {true}{false}
+                \c_space_tl file=\tl_use:N \g_mj_watermark_file_tl }
+}
+\ExplSyntaxOff

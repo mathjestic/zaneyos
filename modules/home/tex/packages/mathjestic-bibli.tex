@@ -1,0 +1,27 @@
+\ProvidesFile{mathjestic-bibli.tex}
+\ExplSyntaxOn
+
+\bool_new:N \g_mathjestic_print_bibliography_bool
+
+\cs_new_protected:Npn \mathjestic_bibliography_set_from_tl:n #1
+  {
+    \tl_if_blank:nTF {#1}
+      { \bool_gset_true:N \g_mathjestic_print_bibliography_bool }
+      { \mathjestic_bool_set_from_tl:Nn \g_mathjestic_print_bibliography_bool {#1} }
+  }
+
+\cs_new_protected:Npn \mathjesticBibliographySetFromTL #1
+  { \mathjestic_bibliography_set_from_tl:n {#1} }
+
+\keys_define:nn { mathjestic }
+  {
+    bibliography        .code:n    = { \mathjesticBibliographySetFromTL {#1} },
+    bibliography        .initial:n = false,
+    print-bibliography  .meta:n    = { bibliography = #1 },
+    printbibliography   .meta:n    = { bibliography = #1 },
+    references          .meta:n    = { bibliography = #1 },
+    refs                .meta:n    = { bibliography = #1 },
+    bib                 .meta:n    = { bibliography = #1 },
+  }
+
+\ExplSyntaxOff

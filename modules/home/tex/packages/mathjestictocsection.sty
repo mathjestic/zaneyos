@@ -1,0 +1,174 @@
+\ProvidesPackage{mathjestictocsection}
+
+% -- Required Packages --
+\RequirePackage{titletoc}
+\RequirePackage{calc}
+\RequirePackage[explicit]{titlesec}
+\RequirePackage{tikz}
+\RequirePackage{xcolor}
+\RequirePackage{fontawesome5}
+
+\patchcmd{\tableofcontents}{\@starttoc{toc}}{%
+  \thispagestyle{fancy}%
+  \@starttoc{toc}%
+  \thispagestyle{fancy}%
+}{}{}
+
+% -- TOC Title Renaming --
+\renewcommand*{\contentsname}{Daftar Isi}
+
+\makeatletter
+\newlength{\tocTitleWidth}
+\renewcommand{\@makeschapterhead}[1]{%
+  \begingroup
+    \setlength{\tocTitleWidth}{\widthof{\bfseries\sffamily\fontsize{40}{48}\selectfont #1}}%
+    \vspace*{0em}%
+    \begin{center}
+      \begin{tikzpicture}
+        % \draw[thick,color=c1] (0,0) -- (\tocTitleWidth+2cm,0);
+        \node at (0,0) [inner sep=0mm, outer sep=0mm, anchor=center, yshift=0 mm, xshift=0 mm] {\includegraphics[scale=1, trim=0 0 0 0, clip]{gradient-\mycolortheme-1}};
+      \end{tikzpicture}
+
+      \vspace{3.4ex}
+
+      {\color{c1}\bfseries\sffamily\fontsize{40}{48}\selectfont #1}
+
+      \begin{tikzpicture}
+        % \draw[thick,color=c1] (0,0) -- (\tocTitleWidth+2cm,0);
+        \node at (0,0) [inner sep=0mm, outer sep=0mm, anchor=center, yshift=0 mm, xshift=0 mm] {\includegraphics[scale=1, trim=0 0 0 0, clip]{gradient-\mycolortheme-2}};
+      \end{tikzpicture}
+    \end{center}
+    \vspace*{5em}%
+  \endgroup
+}
+\makeatother
+
+\makeatletter
+\def\@makechapterhead#1{%
+  \begingroup
+    \pagebreak
+    \hspace{0pt}
+    \thispagestyle{empty}
+    \setlength{\parindent}{0pt}
+    \topskip0pt
+    \begin{tikzpicture}[remember picture, overlay]
+      \node [anchor = south west, inner sep=0, outer sep=0] at (current page.south west) {\includegraphics[scale=1, trim=0 0 0 0, clip]{blackpage}};
+    \end{tikzpicture}%
+    \vspace*{8cm} % Adjust for vertical centering
+    % \vspace*{\fill}
+    \begin{center}
+      {\color{white}\bfseries\montserrat\fontsize{100}{120}\selectfont \thechapter}
+      
+      \vspace{30ex}
+      
+      {\color{white}\bfseries\montserrat\fontsize{100}{120}\selectfont #1}
+    \end{center}
+    % \vspace*{\fill}
+    \vspace*{4cm} % Adjust for vertical balance
+  \endgroup
+}
+\makeatother
+
+% -- TOC Chapter Formatting --
+\newlength{\tocchaplabcon}   % Distance between chapter label and content
+\setlength{\tocchaplabcon}{2.3em}   % Or whatever you like, maybe more than section
+
+\newlength{\tocchapleftcon}  % Distance from left margin to content
+\setlength{\tocchapleftcon}{0em}    % Chapters often align leftmost, adjust if you want indent
+
+\titlecontents{chapter}%
+[\tocchapleftcon] % left indentation from margin
+{\color{c1}\large\bfseries\sffamily} % formatting for entry
+{\contentslabel{\tocchaplabcon}} % numbered chapters
+{} % for unnumbered chapters
+{\hspace*{1em}\hfill\contentspage} % page number formatting
+
+% -- TOC Section Formatting --
+\newlength{\tocseclabcon} % Distance between section label and the section content
+\setlength{\tocseclabcon}{2.3em} % Change for cleaner look
+
+\newlength{\tocsecleftcon} % Distance between the left margin and the section content
+\setlength{\tocsecleftcon}{\tocseclabcon} % Should be the same
+
+\titlecontents{section}[\tocsecleftcon]{\color{exfr}\boldmath\small\bfseries\sffamily}{\contentslabel{\tocseclabcon}}{}{\hspace*{1em}\titlerule*[1pc]{.}\contentspage}
+
+% -- TOC Subsection Formatting --
+\newlength{\tocsubseclabcon} % Distance between the subsection label and the subsection content
+% \setlength{\tocsubseclabcon}{\tocseclabcon}
+\setlength{\tocsubseclabcon}{3em}
+
+\newlength{\tocsubsecleftcon} % Distance between the left margin and the subsection content
+\setlength{\tocsubsecleftcon}{\tocsecleftcon+\tocsubseclabcon}
+
+\titlecontents{subsection}[\tocsubsecleftcon]{\color{exfr2}\small\sffamily}{\contentslabel{\tocsubseclabcon}}{}{\hspace*{1em}\titlerule*[0.5pc]{.}\contentspage}
+% \titlecontents{subsection}[\tocsubsecleftcon]{\color{c2!90}\small\sffamily}{\contentslabel{\tocsubseclabcon}}{}{\hspace*{1em}\titlerule*[0.5pc]{.}\contentspage}
+
+% -- Section/TOC Decorations: TikZ and Colors --
+\usetikzlibrary{fadings, shapes.misc, arrows, positioning}
+
+% -- Section Header Decoration Commands & Colors --
+\newlength{\sepovertwo}
+\setlength{\sepovertwo}{0.125cm}
+\newlength{\trailingline}
+\setlength{\trailingline}{2cm}
+\let\TextHeight\relax
+\newlength{\TextHeight}
+\let\TextWidth\relax
+\newlength{\TextWidth}
+
+\definecolor{mygold}{rgb}{0.83, 0.69, 0.22}
+\definecolor{darkgoldenrod}{rgb}{0.72, 0.53, 0.04}
+\definecolor{goldenrod}{rgb}{0.85, 0.65, 0.13}
+
+\DeclareRobustCommand\Squaresect[1]{+(-#1,-#1) rectangle +(#1,#1)}
+\DeclareRobustCommand\Circlesect[1]{circle (#1)}
+
+% Daun section marker
+\DeclareRobustCommand\sectionul[1]{%
+  \setlength{\TextHeight}{\depthof{()}}%
+  \tikz [baseline=0] {%
+    \node [%
+    text = c1,%
+    anchor = south,%
+    text depth = 0,%
+    outer sep = 0,%
+    inner sep = 0] (a) at (0,0) {%
+      \hspace{\sepovertwo+2.5pt}#1
+    };
+    \node[anchor=south east, text depth=0, color=c2, outer sep = 0, inner sep=0] (b) at (a.south west) {\relsize{-1}\faEnvira};
+    \setlength{\TextWidth}{\widthof{#1}}%
+    \draw[color=c2,path fading=east, very thick,rounded corners=0ex, outer sep=0, inner sep=0] ([xshift=-2.8pt, yshift=1.5pt]b.south east) -- ++(\TextHeight+3.5pt,-\TextHeight-3.5pt) -- ++(\TextWidth+\trailingline,0);
+  }%
+}
+
+% -- Section Title Format --
+\titleformat{\section}{\boldmath\bfseries\Large\sffamily}{\textcolor{c2}{\thesection}}{\sepovertwo}{\sectionul{#1}}
+\titlespacing*{\section}{0pt}{*2}{*3}
+
+% -- Unnumbered Section Title Format (for TOC, Appendices, etc) --
+\titleformat{name=\section, numberless}{\sffamily\bfseries\Large}{}{0pt}{\textcolor{c1}{#1}}
+
+% -- Subsection Header Decoration Commands --
+\DeclareRobustCommand\subsectionul[1]{%
+  \setlength{\TextHeight}{\depthof{()}}%
+  \tikz [baseline=0] {%
+    \node [%
+    text = c1,%
+    anchor = south,%
+    text depth = 0,%
+    outer sep = 0,%
+    inner sep = 0] (a) at (0,0) {%
+      \hspace{\sepovertwo}#1
+    };
+    \node[anchor=south east, text depth=0, color=c3, outer sep = 0, inner sep=0] (b) at (a.south west) {\relsize{-2}\faSeedling};
+    \setlength{\TextWidth}{\widthof{#1}}%
+    \draw[color=c3,path fading=east, line width=1.4pt,rounded corners=0ex, outer sep=0, inner sep=0] ([xshift=-0.074pt,yshift=2.52pt]b.south) |- ++(\TextWidth+\trailingline,-\TextHeight-5.02pt);
+  }%
+}
+
+% -- Subsection Title Format --
+\titleformat{\subsection}{\boldmath\bfseries\large\sffamily}{\textcolor{c3}{\thesubsection}}{\sepovertwo}{\subsectionul{#1}}
+\titlespacing*{\subsection}{0pt}{*2}{*3}
+
+% -- Unnumbered Subsection Title Format (for TOC, Appendices, etc) --
+\titleformat{name=\subsection, numberless}{\sffamily\bfseries\large}{}{0pt}{\textcolor{c1}{#1}}

@@ -1,0 +1,2095 @@
+\ProvidesPackage{mathjesticproblemarticle}
+
+\RequirePackage{tcolorbox}
+\tcbuselibrary{fitting, skins, theorems, breakable, most}
+\RequirePackage{xfp}
+\RequirePackage{needspace}
+\RequirePackage{xspace}
+\makeatletter
+
+\DeclareDocumentCommand {\catatan} { m } {
+  \textcolor{c1!75!black}{\textit{\textbf{Catatan:}~#1}}%
+}
+
+\DeclareDocumentCommand {\aturan} { m } {%
+  \FavoriteHeartToggle\textcolor{c1!50!black}{\textit{#1}}%
+  \par\noindent\dotfill\par%
+}
+
+% ---- Icon wrapper with graceful fallback ----
+\ExplSyntaxOn
+\cs_new:Npn \mj_question_icon:
+  { % FA5/6 if present; else plain ?
+    \cs_if_exist:NTF \faQuestion
+      { \faQuestion }{
+        \cs_if_exist:NTF \faIcon { \faIcon{question} }{ ? }
+      }
+  }
+
+% ---- The command ----
+\NewDocumentCommand{\kenapa}{s}{
+  % Text mode: use textsuperscript; Math mode: genuine superscript with text
+  \mode_if_math:TF
+    { {}^{\smash{\text{\tiny\sffamily\color{exfr}\mj_question_icon:}}} }
+    { \textsuperscript{\fontsize{4}{0}\selectfont\sffamily\color{exfr}\mj_question_icon:} }
+  % Trailing space logic: default smart space, star = no space
+  \IfBooleanF{#1}{\xspace}
+}
+
+% Teach \xspace about macros you don't want a space before (optional):
+\xspaceaddexceptions{\footnote\parencite\cite\Cite\textbf\emph}
+\ExplSyntaxOff
+
+% Kalau mau toggle hint per subsection
+% \DeclareDocumentCommand {\aturan} { m } {%
+%   \FavoriteHeartToggle\HintMarginToggle\textcolor{c1!50!black}{\textit{#1}}%
+%   \par\noindent\dotfill\par%
+% }
+
+\newcommand{\cdottxt}{
+  \begingroup
+  \relsize{-6}\raisebox{1ex}{\faSquare}%
+  \endgroup
+}
+
+\NewDocumentCommand { \mathjesticfreewhatsapp } {  } {
+  \!\!(\href{https://chat.whatsapp.com/JJLxiIbBKi5Gdj8TTQOM7F?mode=ac_t}{\relsize{-1}\faWhatsapp})%
+}
+
+\NewDocumentCommand { \terbukti } {  } {
+  \text{Terbukti}
+}
+
+\newtcbox{\answerbox}{
+  enhanced jigsaw,
+  on line,
+  math upper, math lower,
+  arc=0pt,
+  outer arc=0pt,
+  colback=c6!15!white,
+  colframe=c3,
+  frame style={left color=c3, right color=c5},
+  boxsep=0pt,
+  left=2pt,
+  right=2pt,
+  top=2pt,
+  bottom=2pt,
+  boxrule=0pt,
+  bottomrule=1pt,
+  toprule=1pt,
+}
+
+\newtcbox{\beginnerbox}{
+  enhanced jigsaw,
+  on line,
+  arc=0pt,
+  outer arc=0pt,
+  colback=c6!15!white,
+  colframe=c3,
+  frame style={left color=c4, right color=c6},
+  boxsep=0pt,
+  left=2pt,
+  right=2pt,
+  top=2pt,
+  bottom=2pt,
+  boxrule=0pt,
+  bottomrule=1pt,
+  toprule=1pt,
+}
+
+\newtcbox{\intermediatebox}{
+  enhanced jigsaw,
+  on line,
+  arc=0pt,
+  outer arc=0pt,
+  colback=c5!60!white,
+  colframe=c3,
+  frame style={left color=c3, right color=c5},
+  boxsep=0pt,
+  left=2pt,
+  right=2pt,
+  top=2pt,
+  bottom=2pt,
+  boxrule=0pt,
+  bottomrule=1pt,
+  toprule=1pt,
+}
+
+\newtcbox{\advancedbox}{
+  enhanced jigsaw,
+  on line,
+  arc=0pt,
+  outer arc=0pt,
+  colback=c4!50!white,
+  colframe=c3,
+  frame style={left color=c1, right color=c4},
+  boxsep=0pt,
+  left=2pt,
+  right=2pt,
+  top=2pt,
+  bottom=2pt,
+  boxrule=0pt,
+  bottomrule=1pt,
+  toprule=1pt,
+}
+
+% 3.84 dari (pageheight - 2 * tikzheaderheight) / 90 (90 kotak kecil pas)
+\NewTCBoxFit{\mytcbfit}{ m m }{
+  enhanced jigsaw,
+  boxsep=0mm,
+  halign=center,
+  valign=center,
+  nobeforeafter,
+  left=0mm,
+  right=0mm,
+  top=0mm,
+  bottom=0mm,
+  sharp corners,
+  width=3.84mm,
+  height=3.84mm,
+  boxrule=0mm,
+  interior style={top color=#1, bottom color=#2},
+  colframe=white,
+}
+
+\NewDocumentCommand{\mytombol}{ m m m m }{
+  \mbox{\mytcbfit{#1}{#2}{\color{#3}\sffamily\bfseries\tiny{#4}}}
+}
+
+\ExplSyntaxOn
+\NewTCBox{\mytcbfitproblem} { } {
+  enhanced~jigsaw,
+  boxsep=0mm,
+  halign=center,
+  valign=center,
+  nobeforeafter,
+  left=1mm,
+  right=1mm,
+  top=1mm,
+  bottom=1mm,
+  sharp~corners,
+  boxrule=1pt,
+  colback/.expanded={\ProblemNumColback},
+  % colback/.expanded=\tl_use:N \g_mj_problem_num_colback_tl,
+  % \IfThisProblemImportantTF { colback = red } { colback = pnbg },
+  % colback=pnbg,
+  frame~style={left~color=pnfr, right~color=pnfr2},
+  tcbox~raise~base, % supaya baseline rata
+}
+\ExplSyntaxOff
+
+% https://tex.stackexchange.com/questions/620785/shading-a-heart
+
+\NewTCBox{\mytcbfitfavproblem} { } {
+  enhanced jigsaw,
+  boxsep=0mm,
+  halign=center,
+  valign=center,
+  nobeforeafter,
+  left=1mm,
+  right=1mm,
+  top=1mm,
+  bottom=1mm,
+  sharp corners,
+  boxrule=1pt,
+  colback=pnbg,
+  frame hidden,
+  interior hidden,
+  tcbox raise base, % supaya baseline rata
+  underlay={%
+    \def\cur{(0,-2.7)..controls (-1.85,-1.45) and (-1.8,-0.52)..(-1.7,-0.13)
+      ..controls (-1.52,0.63) and (-0.37,0.74)..(0,0)
+      ..controls (0.37,0.74) and (1.52,0.63)..(1.7,-0.13)
+      ..controls (1.8,-0.52) and  (1.85,-1.45).. cycle}
+      % \path[shading=ball,ball color=c3] \cur;
+      % compute transforms
+    \path let
+      \p1 = (frame.west),
+      \p2 = (frame.east),
+      \n1 = {veclen(\x2-\x1,\y2-\y1)/2},   % half of frame width (a length)
+      \n2 = {\n1/(1.4cm)},                % uniform scale so ±1.85 → ±(frame half-width)
+      \n3 = {1.125cm * \n2}                 % yshift so (0,-1.35) maps to center
+    in
+      [shade, left color=pnfr, right color=pnfr2, shading angle=90,
+      shift={(frame.center)},             % put origin at frame.center
+      yshift=\n3,                         % lift -1.35*scale to 0
+      xscale=\n2, yscale=\n2]             % keep aspect ratio
+    \cur;
+    % \path[shade, left color=pnfr, right color=pnfr2, shading angle=90, opacity=0.2] (frame.north west) -- (frame.north east) -- (frame.south east) -- (frame.south west) -- cycle;
+    \path let
+      \p1 = (frame.west),
+      \p2 = (frame.east),
+      \n1 = {veclen(\x2-\x1,\y2-\y1)/2}, % half width
+      \n2 = {\n1/(1.4cm)},                % uniform scale so ±1.85 → ±(frame half-width)
+      \n3 = {1.125cm * \n2},                 % yshift so (0,-1.35) maps to center
+      \n4 = {0.74cm * \n2},
+      \n5 = {1.85cm * \n2}
+    in
+      [draw=pnfr2, opacity=1, line width=0.25mm]
+      ($ (frame.center) + (0,\n3) + (0,\n4) + (0,0.5mm) $) ellipse [x radius=\n5, y radius=0.5mm];
+  }
+}
+
+\NewTCBox{\mytcbfitfavproblemtwodigits} { } {
+  enhanced jigsaw,
+  boxsep=0mm,
+  halign=center,
+  valign=center,
+  nobeforeafter,
+  left=1mm,
+  right=1mm,
+  top=1mm,
+  bottom=1mm,
+  sharp corners,
+  boxrule=1pt,
+  colback=pnbg,
+  frame hidden,
+  interior hidden,
+  tcbox raise base, % supaya baseline rata
+  underlay={%
+    \def\cur{(0,-2.7)..controls (-1.85,-1.45) and (-1.8,-0.52)..(-1.7,-0.13)
+      ..controls (-1.52,0.63) and (-0.37,0.74)..(0,0)
+      ..controls (0.37,0.74) and (1.52,0.63)..(1.7,-0.13)
+      ..controls (1.8,-0.52) and  (1.85,-1.45).. cycle}
+      % \path[shading=ball,ball color=c3] \cur;
+      % compute transforms
+    \path let
+      \p1 = (frame.west),
+      \p2 = (frame.east),
+      \n1 = {veclen(\x2-\x1,\y2-\y1)/2},   % half of frame width (a length)
+      \n2 = {\n1/(1.65cm)},                % uniform scale so ±1.85 → ±(frame half-width)
+      \n3 = {0.98cm * \n2}                 % yshift so (0,-1.35) maps to center
+    in
+      [shade, left color=pnfr, right color=pnfr2, shading angle=90,
+      shift={(frame.center)},             % put origin at frame.center
+      yshift=\n3,                         % lift -1.35*scale to 0
+      xscale=\n2, yscale=\n2]             % keep aspect ratio
+    \cur;
+    \path let
+      \p1 = (frame.west),
+      \p2 = (frame.east),
+      \n1 = {veclen(\x2-\x1,\y2-\y1)/2}, % half width
+      \n2 = {\n1/(1.65cm)},                % uniform scale so ±1.85 → ±(frame half-width)
+      \n3 = {0.98cm * \n2},                 % yshift so (0,-1.35) maps to center
+      \n4 = {0.74cm * \n2},
+      \n5 = {1.85cm * \n2}
+    in
+      [draw=pnfr2, opacity=1, line width=0.25mm]
+      ($ (frame.center) + (0,\n3) + (0,\n4) + (0,0.5mm) $) ellipse [x radius=\n5, y radius=0.5mm];
+  }
+}
+
+\newlength{\offsetoctagon}
+\newlength{\corneroctagon}
+\newlength{\widthoctagon}
+\setlength{\widthoctagon}{1pt}
+\setlength{\corneroctagon}{1.25mm}
+
+\NewTCBox{\mytcbfitsolution}{ O{} }{%
+  enhanced jigsaw,
+  on line,
+  nobeforeafter,
+  halign=center,
+  valign=center,
+  boxsep=0pt,
+  left=1mm, right=1mm, top=1mm, bottom=1mm, % padding inside the heart
+  tcbox raise base,
+  % colback/.expanded={\ProblemNumColback},
+  % colback=snbg,
+  % colframe=c3,
+  frame hidden,
+  interior hidden,
+  underlay={%
+    \pgfmathsetlength{\offsetoctagon}{(sqrt(2)-1)*(\widthoctagon)}
+    \path[shade, left color=snfr2, right color=snfr, shading angle=45, line width=1pt] ([xshift=\corneroctagon]frame.north west) -- ([yshift=-\corneroctagon]frame.north west) -- ([yshift=\corneroctagon]frame.south west) -- ([xshift=\corneroctagon]frame.south west) -- ([xshift=-\corneroctagon]frame.south east) -- ([yshift=\corneroctagon]frame.south east) --  ([yshift=-\corneroctagon]frame.north east) -- ([xshift=-\corneroctagon]frame.north east) -- cycle;
+    \path[fill=\ProblemNumColback] ([xshift=\corneroctagon+\offsetoctagon, yshift=-\widthoctagon]frame.north west) -- ([xshift=\widthoctagon, yshift=-(\corneroctagon+\offsetoctagon)]frame.north west) -- ([xshift=\widthoctagon, yshift=\corneroctagon+\offsetoctagon]frame.south west) -- ([xshift=\corneroctagon+\offsetoctagon, yshift=\widthoctagon]frame.south west) -- ([xshift=-(\corneroctagon+\offsetoctagon), yshift=\widthoctagon]frame.south east) -- ([xshift=-\widthoctagon, yshift=\corneroctagon+\offsetoctagon]frame.south east) --  ([xshift=-\widthoctagon, yshift=-(\corneroctagon+\offsetoctagon)]frame.north east) -- ([xshift=-(\corneroctagon+\offsetoctagon), yshift=-\widthoctagon]frame.north east) -- cycle;
+  }
+  % allow per-call customization
+  #1%
+}
+
+\NewTCBox{\mytcbfitfavsolution}{ O{} }{%
+  enhanced jigsaw,
+  on line,
+  nobeforeafter,
+  halign=center,
+  valign=center,
+  boxsep=0pt,
+  left=1mm, right=1mm, top=1mm, bottom=1mm, % padding inside the heart
+  tcbox raise base,
+  % colback={\ProblemNumColback},
+  colback=snbg,
+  % colframe=c3,
+  frame hidden,
+  interior hidden,
+  underlay={%
+    \pgfmathsetlength{\offsetoctagon}{(sqrt(2)-1)*(\widthoctagon)}
+    \path[shade, left color=snfr2, right color=snfr, shading angle=45, line width=1pt] ([xshift=\corneroctagon]frame.north west) -- ([yshift=-\corneroctagon]frame.north west) -- ([yshift=\corneroctagon]frame.south west) -- ([xshift=\corneroctagon]frame.south west) -- ([xshift=-\corneroctagon]frame.south east) -- ([yshift=\corneroctagon]frame.south east) --  ([yshift=-\corneroctagon]frame.north east) -- ([xshift=-\corneroctagon]frame.north east) -- cycle;
+    % \path[fill=white] ([xshift=\corneroctagon+\offsetoctagon, yshift=-\widthoctagon]frame.north west) -- ([xshift=\widthoctagon, yshift=-(\corneroctagon+\offsetoctagon)]frame.north west) -- ([xshift=\widthoctagon, yshift=\corneroctagon+\offsetoctagon]frame.south west) -- ([xshift=\corneroctagon+\offsetoctagon, yshift=\widthoctagon]frame.south west) -- ([xshift=-(\corneroctagon+\offsetoctagon), yshift=\widthoctagon]frame.south east) -- ([xshift=-\widthoctagon, yshift=\corneroctagon+\offsetoctagon]frame.south east) --  ([xshift=-\widthoctagon, yshift=-(\corneroctagon+\offsetoctagon)]frame.north east) -- ([xshift=-(\corneroctagon+\offsetoctagon), yshift=-\widthoctagon]frame.north east) -- cycle;
+  }
+  % allow per-call customization
+  #1%
+}
+
+% \NewTCBox{\mytcbfithint} { } {
+%   enhanced jigsaw,
+%   boxsep=0mm,
+%   halign=center,
+%   valign=center,
+%   nobeforeafter,
+%   left=1mm,
+%   right=1mm,
+%   top=1mm,
+%   bottom=1mm,
+%   sharp corners,
+%   boxrule=1pt,
+%   colback=c6!35,
+%   frame style={left color=c5, right color=c5},
+%   tcbox raise base, % supaya baseline rata
+% }
+
+\NewTCBox{\mytcbfithint} { } {
+  enhanced jigsaw,
+  boxsep=0mm,
+  halign=center,
+  valign=center,
+  nobeforeafter,
+  left=1mm,
+  right=1mm,
+  top=1mm,
+  bottom=1mm,
+  arc=1.25mm,
+  boxrule=1pt,
+  colback=hnbg,
+  frame style={left color=hnfr2, right color=hnfr},
+  tcbox raise base, % supaya baseline rata
+}
+
+% \ExplSyntaxOn
+% \DeclareDocumentCommand {\promosi} { m D""{} D(){} O{Date~not~specified} D<>{1} } {
+%   \tl_if_eq:nnTF {#4} {0} {
+%     \tl_set:Nn \l_tmpa_tl {\textbf{\textcolor{c3}{Free!}}}
+%   } {
+%     \tl_if_eq:nnTF {#4} {1} {
+%       \tl_set:Nn \l_tmpa_tl {\textbf{\textcolor{c2}{Paid}}}
+%     } {
+%       \tl_if_eq:nnTF {#4} {2} {
+%         \tl_set:Nn \l_tmpa_tl {\textbf{\textcolor{c3}{Free}~\textcolor{c1}{\&}~\textcolor{c2}{Paid}}}
+%       } {
+%         \tl_set:Nn \l_tmpa_tl {\textbf{\textcolor{red}{!!!}}}
+%       }
+%     }
+%   }
+%   \tl_if_eq:nnTF {#2} {0} {
+%     \tl_set:Nn \l_tmpb_tl {\textsl{\textsf{\beginnerbox{\textcolor{c2}{Beginner}}}}}
+%   } {
+%     \tl_if_eq:nnTF {#2} {1} {
+%       \tl_set:Nn \l_tmpb_tl {\textsl{\textsf{\intermediatebox{\textcolor{c2}{Intermediate}}}}}
+%     } {
+%       \tl_if_eq:nnTF {#2} {2} {
+%         \tl_set:Nn \l_tmpb_tl {\textsl{\textsf{\advancedbox{\textcolor{c2}{Advanced}}}}}
+%       } {
+%         \tl_set:Nn \l_tmpb_tl {!!!}
+%       }
+%     }
+%   }
+%   \str_if_eq:VnTF {\l_tmpb_tl} {!!!} {
+%     \textbf{#1}~\cdottxt~\hspace{0.6ex}~\textcolor{c1}{\textit{#3}}~\cdottxt~\hspace{0.7ex}~\tl_use:N \l_tmpa_tl
+%   } {
+%     \textbf{#1}~\cdottxt~\hspace{1ex}~\tl_use:N \l_tmpb_tl \hspace{0.2ex}~\cdottxt~\hspace{0.6ex}~\textcolor{c1}{\textit{#3}}~\cdottxt~\hspace{0.7ex}~\tl_use:N \l_tmpa_tl
+%   }
+% }
+% \ExplSyntaxOff
+
+
+\ExplSyntaxOn
+\DeclareDocumentCommand {\promosi} { m D""{} D(){} O{Date~not~specified} D<>{1} } {
+  \tl_if_eq:nnTF {#5} {0} {
+    \tl_set:Nn \l_tmpa_tl {\textbf{\textcolor{c3}{Free*}}}
+  } {
+    \tl_if_eq:nnTF {#5} {1} {
+      \tl_set:Nn \l_tmpa_tl {\textbf{\textcolor{c2}{Premium}}}
+    } {
+      \tl_if_eq:nnTF {#5} {2} {
+        \tl_set:Nn \l_tmpa_tl {\textbf{\textcolor{c3}{Free*}~\textcolor{c1}{\&}~\textcolor{c2}{Premium}}}
+      } {
+        \tl_set:Nn \l_tmpa_tl {\textbf{\textcolor{red}{!!!}}}
+      }
+    }
+  }
+  \tl_if_eq:nnTF {#3} {0} {
+    \tl_set:Nn \l_tmpb_tl {\textsl{\textsf{\beginnerbox{\textcolor{c2}{Beginner}}}}}
+  } {
+    \tl_if_eq:nnTF {#3} {1} {
+      \tl_set:Nn \l_tmpb_tl {\textsl{\textsf{\intermediatebox{\textcolor{c2}{Intermediate}}}}}
+    } {
+      \tl_if_eq:nnTF {#3} {2} {
+        \tl_set:Nn \l_tmpb_tl {\textsl{\textsf{\advancedbox{\textcolor{c2}{Advanced}}}}}
+      } {
+        \tl_set:Nn \l_tmpb_tl {!!!}
+      }
+    }
+  }
+  \tl_if_eq:nnTF {#2} {A} {
+    \tl_set:Nn \l_tmpc_tl {\textbf{\texttt{\textcolor{c3}{[A]}}}}
+  } {
+    \tl_if_eq:nnTF {#2} {N} {
+      \tl_set:Nn \l_tmpc_tl {\textbf{\texttt{\textcolor{c3}{[N]}}}}
+    } {
+      \tl_if_eq:nnTF {#2} {G} {
+        \tl_set:Nn \l_tmpc_tl {\textbf{\texttt{\textcolor{c3}{[G]}}}}
+      } {
+        \tl_if_eq:nnTF {#2} {C} {
+          \tl_set:Nn \l_tmpc_tl {\textbf{\texttt{\textcolor{c3}{[C]}}}}
+        } {
+          \tl_set:Nn \l_tmpc_tl {\textbf{\texttt{\textcolor{c3}{[X]}}}}
+        }
+      }
+    }
+  }
+  \str_if_eq:VnTF {\l_tmpb_tl} {!!!} {
+    \textbf{#1}~\tl_use:N \l_tmpc_tl~\cdottxt~\hspace{0.6ex}~\textcolor{c1}{\textit{#4}}~\cdottxt~\hspace{0.7ex}~\tl_use:N \l_tmpa_tl
+  } {
+    \textbf{#1}~\tl_use:N \l_tmpc_tl~\cdottxt~\hspace{1ex}~\tl_use:N \l_tmpb_tl \hspace{0.2ex}~\cdottxt~\hspace{0.6ex}~\textcolor{c1}{\textit{#4}}~\cdottxt~\hspace{0.7ex}~\tl_use:N \l_tmpa_tl
+  }
+}
+\ExplSyntaxOff
+
+
+\newcommand{\gettikzxy}[3]{%
+  \tikz@scan@one@point\pgfutil@firstofone#1\relax
+  \edef#2{\the\pgf@x}%
+  \edef#3{\the\pgf@y}%
+}
+
+% \NewDocumentCommand \hbutton { m m } {%
+%   \begin{tikzpicture}[remember picture, overlay]%
+%     \gettikzxy{(current page.east)}{\ax}{\ay}%
+%     \pgfmathsetmacro{\tombolheight}{3.84}
+%     \pgfmathsetmacro{\tempyshift}{-\tombolheight*(#2 - 1)+\tombolheight/2}
+%     \pgfmathsetmacro{\tempxshift}{-\tombolheight/2}
+%     \ifcase#2
+%       \PackageWarning{hbutton}{Case 0 is not valid!}%
+%     \or % case 1
+%       \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+%         {\protect\hyperlink{hyperhint:#1}{\includegraphics[scale=1, trim=0 0 0 0, clip]{hintbutton-\mycolortheme-1}}};
+%       \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+%         {\textcolor{\hinttextcolorone}{\sffamily\bfseries\tiny #1}};
+%     \or % case 2
+%       \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+%         {\protect\hyperlink{hyperhint:#1}{\includegraphics[scale=1, trim=0 0 0 0, clip]{hintbutton-\mycolortheme-2}}};
+%       \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+%         {\textcolor{\hinttextcolortwo}{\sffamily\bfseries\tiny #1}};
+%     \or % case 3
+%       \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+%         {\protect\hyperlink{hyperhint:#1}{\includegraphics[scale=1, trim=0 0 0 0, clip]{hintbutton-\mycolortheme-3}}};
+%       \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+%         {\textcolor{\hinttextcolorthree}{\sffamily\bfseries\tiny #1}};
+%     \or % case 4
+%       \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+%         {\protect\hyperlink{hyperhint:#1}{\includegraphics[scale=1, trim=0 0 0 0, clip]{hintbutton-\mycolortheme-4}}};
+%       \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+%         {\textcolor{\hinttextcolorfour}{\sffamily\bfseries\tiny #1}};
+%     \else
+%       \PackageWarning{hbutton}{Case value #2 not valid (should be 1-4)}%
+%     \fi
+%   \end{tikzpicture}%
+% }
+
+% \NewDocumentCommand \hbutton { m m } {%
+%   \begin{ocg}{Hints visible}{hintOn}{0}%  <-- visible layer
+%     \begin{tikzpicture}[remember picture, overlay]%
+%       \gettikzxy{(current page.east)}{\ax}{\ay}%
+%       \pgfmathsetmacro{\tombolheight}{3.84}
+%       \pgfmathsetmacro{\tempyshift}{-\tombolheight*(#2 - 1)+\tombolheight/2}
+%       \pgfmathsetmacro{\tempxshift}{-\tombolheight/2}
+%       \ifcase#2
+%         \PackageWarning{hbutton}{Case 0 is not valid!}%
+%       \or % case 1
+%         \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+%           {\protect\hyperlink{hyperhint:#1}{\includegraphics[scale=1, trim=0 0 0 0, clip]{hintbutton-\mycolortheme-1}}};
+%         \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+%           {\textcolor{\hinttextcolorone}{\sffamily\bfseries\tiny #1}};
+%       \or % case 2
+%         \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+%           {\protect\hyperlink{hyperhint:#1}{\includegraphics[scale=1, trim=0 0 0 0, clip]{hintbutton-\mycolortheme-2}}};
+%         \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+%           {\textcolor{\hinttextcolortwo}{\sffamily\bfseries\tiny #1}};
+%       \or % case 3
+%         \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+%           {\protect\hyperlink{hyperhint:#1}{\includegraphics[scale=1, trim=0 0 0 0, clip]{hintbutton-\mycolortheme-3}}};
+%         \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+%           {\textcolor{\hinttextcolorthree}{\sffamily\bfseries\tiny #1}};
+%       \or % case 4
+%         \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+%           {\protect\hyperlink{hyperhint:#1}{\includegraphics[scale=1, trim=0 0 0 0, clip]{hintbutton-\mycolortheme-4}}};
+%         \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+%           {\textcolor{\hinttextcolorfour}{\sffamily\bfseries\tiny #1}};
+%       \else
+%         \PackageWarning{hbutton}{Case value #2 not valid (should be 1-4)}%
+%       \fi
+%     \end{tikzpicture}%
+%   \end{ocg}%
+%   % empty partner layer to participate in the toggle (keeps state consistent)
+%   \begin{ocg}{Hints hidden}{hintOff}{1}\rule{0pt}{0pt}\end{ocg}%
+% }
+
+\NewDocumentCommand \hbutton { m m } {%
+  \begin{tikzpicture}[remember picture, overlay]%
+    % ADDED: confine OCG to this picture only
+    \begin{scope}[ocg={ref=hintOn, name={Hints visible}, status=invisible}]
+      \gettikzxy{(current page.east)}{\ax}{\ay}%
+      \pgfmathsetmacro{\tombolheight}{3.84}
+      \pgfmathsetmacro{\tempyshift}{-\tombolheight*(#2 - 1)+\tombolheight/2}
+      \pgfmathsetmacro{\tempxshift}{-\tombolheight/2}
+      \ifcase#2
+        \PackageWarning{hbutton}{Case 0 is not valid!}%
+      \or % case 1
+        \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+          {\protect\hyperlink{hyperhint:#1}{\includegraphics[scale=1, trim=0 0 0 0, clip]{hintbutton-\mycolortheme-1}}};
+        \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+          {\textcolor{\hinttextcolorone}{\sffamily\bfseries\tiny #1}};
+      \or % case 2
+        \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+          {\protect\hyperlink{hyperhint:#1}{\includegraphics[scale=1, trim=0 0 0 0, clip]{hintbutton-\mycolortheme-2}}};
+        \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+          {\textcolor{\hinttextcolortwo}{\sffamily\bfseries\tiny #1}};
+      \or % case 3
+        \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+          {\protect\hyperlink{hyperhint:#1}{\includegraphics[scale=1, trim=0 0 0 0, clip]{hintbutton-\mycolortheme-3}}};
+        \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+          {\textcolor{\hinttextcolorthree}{\sffamily\bfseries\tiny #1}};
+      \or % case 4
+        \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+          {\protect\hyperlink{hyperhint:#1}{\includegraphics[scale=1, trim=0 0 0 0, clip]{hintbutton-\mycolortheme-4}}};
+        \node at (\ax,0) [inner sep=0cm, outer sep=0pt, anchor=center, yshift=\tempyshift mm, xshift=\tempxshift mm]
+          {\textcolor{\hinttextcolorfour}{\sffamily\bfseries\tiny #1}};
+      \else
+        \PackageWarning{hbutton}{Case value #2 not valid (should be 1-4)}%
+      \fi
+    \end{scope}%  <-- ADDED
+  \end{tikzpicture}%
+  % keep your predeclared hintOn/hintOff OCGs; no need to wrap more here
+}
+
+\RequirePackage{answers}
+\RequirePackage{marginnote}
+\RequirePackage{fourier-orns}
+
+\NewDocumentCommand \ornamentbig { m } {
+  \noindent\textcolor{#1}{\hrulefill ~ \raisebox{-2.5pt}[10pt][10pt]{\leafright \decofourleft \decothreeleft  \aldineright \decotwo \floweroneleft \decoone   \floweroneright \decotwo \aldineleft\decothreeright \decofourright \leafleft} ~ \hrulefill}
+}
+
+\NewDocumentCommand \ornamentsmall { } {
+  \noindent{\hspace*{2cm}\color{c4!40}\raisebox{-2.1pt}[10pt][10pt]{\leafright}\hrulefill ~ \raisebox{-2.1pt}[10pt][10pt]{\decofourleft \decoone\decofourright} ~ \hrulefill\raisebox{-2.1pt}[10pt][10pt]{\leafleft}\hspace*{2cm}}
+}
+
+\ExplSyntaxOn
+
+% \newcommand{\zerodisplayskips}{%
+%   \setlength{\abovedisplayskip}{0.375\baselineskip}%
+%   \setlength{\belowdisplayskip}{0.375\baselineskip}%
+%   \setlength{\abovedisplayshortskip}{0.25\baselineskip}%
+%   \setlength{\belowdisplayshortskip}{0.25\baselineskip}%
+% }
+% \appto{\normalsize}{\zerodisplayskips}
+
+\int_new:N \g_claim_number_per_solution_int
+\newcounter{claimreference}
+\renewcommand{\theclaimreference}{\int_use:N \g_claim_number_per_solution_int}
+
+\crefname  {claimreference}{klaim}{Klaim}  % lower-case
+\Crefname  {claimreference}{Klaim}{Klaim}  % capitalised
+
+\crefformat{claimreference}{#2klaim~#1#3}   % lower-case \cref
+\Crefformat{claimreference}{#2Klaim~#1#3}   % capital-case \Cref
+
+% link the *environment* name to that counter
+\crefalias{klaim}{claimreference}
+
+% Main header builder: typesets the coloured heading line
+\cs_new_protected:Npn \__claim_header:n #1
+  {
+    \int_gincr:N \g_claim_number_per_solution_int
+    \refstepcounter{claimreference}
+    \textcolor{cltxt}{\textbf{\textsf{Klaim \space \int_use:N \g_claim_number_per_solution_int}} \hspace{0.7em} \faLightbulb[regular]}
+  }
+
+% Environment definition ------------------------------------
+\NewDocumentEnvironment { klaim } { O{} }  % optional argument = title
+  {
+    \begin{mdframed}[
+      skipabove      = 2.5\parsep,
+      skipbelow      = 2\parsep,
+      rightline      = false,
+      leftline       = true,
+      topline        = false,
+      bottomline     = false,
+      roundcorner    = 0pt,
+      linewidth      = 3pt,
+      linecolor      = clfr,
+      backgroundcolor= clbg,
+      innertopmargin = 12pt,
+      innerbottommargin = 12pt,
+      innerleftmargin   = 12pt,
+      innerrightmargin  = 12pt,
+    ]
+
+    \__claim_header:n {#1} \hspace{0.7em}
+  }
+  {
+    \end{mdframed}
+  }
+
+\newcommand{\zerodisplayskips}{%
+  \setlength{\abovedisplayskip}{0.25\baselineskip}%
+  \setlength{\belowdisplayskip}{0.25\baselineskip}%
+  \setlength{\abovedisplayshortskip}{0.125\baselineskip}%
+  \setlength{\belowdisplayshortskip}{0.125\baselineskip}%
+}
+\appto{\normalsize}{\zerodisplayskips}
+
+\newcommand{\changetoshortskip}{
+  \vspace*{-0.25\baselineskip}%
+}
+
+% Fixed shuffling hint
+\sys_gset_rand_seed:n {1107}
+
+\newcounter{problemnumber}
+\newlist{problemlist}{enumerate}{1}
+\setlist[problemlist]{%
+  label=\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}},
+  ref=\theproblemnumber,
+  partopsep=0.125\baselineskip,
+  topsep=0.125\baselineskip,
+  itemsep=2.5ex,
+  leftmargin=*,
+}
+
+\int_new:N \g_problem_ID_int
+\int_new:N \g_problemset_ID_int
+\int_gset:Nn \g_problem_ID_int {0}
+\str_new:N \g_problemset_name_str
+\str_new:N \g_problemset_handle_str
+\str_gset:Nn \g_problemset_handle_str {@dummyproblemsethandle}
+\prop_new:N \g_problemset_handle_prop
+\prop_new:N \g_problemset_handle_color_index_prop
+\seq_new:N \g_problemset_handle_titlepage_seq
+
+\NewDocumentEnvironment { problemset } { m o d<> } {
+  \int_gincr:N \g_problemset_ID_int
+  \int_gset:Nn \g_fav_problem_ps_counter_int {0}
+  \int_gset:Nn \g_hint_ps_counter_int {0}
+  \str_if_eq:NNTF {#3} {resume} {  } {
+    \setcounter{problemnumber}{0}
+  }
+  \str_gset:Nn \g_problemset_name_str {#1}
+  \newpage
+  \int_compare:nNnT {\g_problem_ID_int} = {0} {
+    \tl_if_novalue:nF {#2} {
+      \str_set:Nn \l_current_problemset_handle_str {#2}
+      \str_if_eq:NNF \g_problemset_handle_str \l_current_problemset_handle_str { 
+        % \prop_gput:Nee \g_problemset_handle_prop { \int_eval:n {\g_problem_ID_int + 1} } { \g_problemset_handle_str }
+        \str_gset:Nn \g_problemset_handle_str { \str_use:N \l_current_problemset_handle_str }
+        % \section{ \str_use:N \l_current_problemset_handle_str }
+        \IfVideoTF { } { \section{Soal} }
+      }
+    }
+  }
+  \IfVideoTF { } { \subsection{\g_problemset_name_str} }
+  \mj_favorite_this_ps_begin:
+  \mj_hint_this_ps_begin:
+} { }
+
+\int_new:N \g_problem_number_int
+\int_new:N \l_nth_solutions_of_the_problem_int
+\prop_new:N \g_problem_source_prop
+\int_new:N \l_nth_hint_of_the_problem_int
+
+% =========================================================
+% FAVORITE PROBLEM TOGGLE CODE
+% =========================================================
+
+\bool_new:N \g_mj_fav_problem_bool
+\prop_new:N \g_mj_fav_problem_prop
+\int_new:N \g_fav_problem_number_int
+\int_new:N \g_fav_problem_ps_counter_int
+\int_new:N \g_hint_ps_counter_int
+\tl_new:N \l__mj_problem_flags_tl
+
+% parser: set global fav from <flags>
+\cs_new_protected:Npn \__mj_problem_update_fav_from_flags:n #1
+  {
+    \tl_set:Nn \l__mj_problem_flags_tl
+      { #1 }
+
+    % compute boolean
+    \bool_gset_false:N \g_mj_fav_problem_bool
+    \tl_if_blank:VTF \l__mj_problem_flags_tl
+      { }  % keep false
+      {
+        \tl_if_in:VnT \l__mj_problem_flags_tl { fav }
+          { \bool_gset_true:N \g_mj_fav_problem_bool \int_gincr:N \g_fav_problem_ps_counter_int }
+      }
+    % --- store "true"/"false" snapshot for this problem ID ---
+    \prop_gput:Nee \g_mj_fav_problem_prop
+      { \int_use:N \g_problem_ID_int }
+      { \bool_if:NTF \g_mj_fav_problem_bool { true } { false } }
+  }
+
+% --- User-friendly conditionals
+\NewDocumentCommand \IfFavoriteProblemTF { m m }
+  { \bool_if:NTF \g_mj_fav_problem_bool {#1} {#2} }
+
+\NewDocumentCommand \IfFavoriteProblemT { m }
+  { \bool_if:NT  \g_mj_fav_problem_bool {#1} }
+
+\NewDocumentCommand \IfFavoriteProblemF { m }
+  { \bool_if:NF \g_mj_fav_problem_bool {#1} }
+
+% =========================================================
+% FAVORITE TOGGLE — PER SUBSECTION (keyed by \g_problemset_ID_int)
+% =========================================================
+
+% OCG name holders (per subsection)
+\tl_new:N \l_mj_psfav_on_tl
+\tl_new:N \l_mj_psfav_off_tl
+\tl_new:N \l_mj_psficon_on_tl
+\tl_new:N \l_mj_psficon_off_tl
+
+% Build names from \g_problemset_ID_int
+\cs_new_protected:Npn \mj_favorite_this_ps_init:
+  {
+    \tl_set:Nx \l_mj_psfav_on_tl    { mj-psfav-on-\int_use:N \g_problemset_ID_int }
+    \tl_set:Nx \l_mj_psfav_off_tl   { mj-psfav-off-\int_use:N \g_problemset_ID_int }
+    \tl_set:Nx \l_mj_psficon_on_tl  { mj-psficon-on-\int_use:N \g_problemset_ID_int }
+    \tl_set:Nx \l_mj_psficon_off_tl { mj-psficon-off-\int_use:N \g_problemset_ID_int }
+  }
+
+% Predeclare (initial: subsection FAVORITES are OFF)
+\cs_new_protected:Npn \mj_favorite_this_ps_predeclare:
+  {
+    \begingroup
+      % master: ON hidden, OFF visible (initial OFF)
+      \begin{ocg}{Subsection favorites ON  \int_use:N\g_problemset_ID_int}{\l_mj_psfav_on_tl}{0}\end{ocg}%
+      \begin{ocg}{Subsection favorites OFF \int_use:N\g_problemset_ID_int}{\l_mj_psfav_off_tl}{1}\end{ocg}%
+      % icon: colored hidden, grey visible
+      \begin{ocg}{Fav icon ON  \int_use:N\g_problemset_ID_int}{\l_mj_psficon_on_tl}{0}\end{ocg}%
+      \begin{ocg}{Fav icon OFF \int_use:N\g_problemset_ID_int}{\l_mj_psficon_off_tl}{1}\end{ocg}%
+    \endgroup
+  }
+
+% Convenience
+\cs_new_protected:Npn \mj_favorite_this_ps_begin:
+  { \mj_favorite_this_ps_init: \mj_favorite_this_ps_predeclare: }
+
+% Shifts (you already have these; keep using them)
+\dim_new:N \l_mj_favheart_icon_hshift_dim
+\dim_new:N \l_mj_favheart_icon_vshift_dim
+\dim_set:Nn \l_mj_favheart_icon_hshift_dim { 2mm }
+% \dim_set:Nn \l_mj_favheart_icon_hshift_dim { 0pt }
+\dim_set:Nn \l_mj_favheart_icon_vshift_dim { 1.25pt }
+% \dim_set:Nn \l_mj_favheart_icon_vshift_dim { 1.25pt }
+
+\cs_set_protected:Npn \mj_favorite_toggle_heart_margin:
+  {
+    \group_begin:
+      \leavevmode
+      \raisebox{0pt}[0pt][0pt]{%
+        \reversemarginpar
+        \marginnote{%
+          \makebox[\dimexpr\marginparwidth-\l_mj_favheart_icon_hshift_dim\relax][c]{%
+            \hspace*{\dim_use:N \l_mj_favheart_icon_hshift_dim}%
+            % Toggle order: master ON, master OFF, icon ON, icon OFF
+            \switchocg{\l_mj_psfav_on_tl,\l_mj_psfav_off_tl,\l_mj_psficon_on_tl,\l_mj_psficon_off_tl}{%
+              \begin{tikzpicture}[x=1mm,y=1mm]
+                \def\cur{(0,-2.7)..controls (-1.85,-1.45) and (-1.8,-0.52)..(-1.7,-0.13)
+                  ..controls (-1.52,0.63) and (-0.37,0.74)..(0,0)
+                  ..controls (0.37,0.74) and (1.52,0.63)..(1.7,-0.13)
+                  ..controls (1.8,-0.52) and  (1.85,-1.45)..cycle}
+                % colored (ON) icon — hidden initially
+                \begin{ocg}{Favorite heart ON}{\tl_use:N \l_mj_psficon_on_tl}{0}
+                  \path[shade, left~color=pnfr, right~color=pnfr2, shading~angle=90] \cur;
+                  \path[draw=pnfr2, line~width=0.2mm, yshift=0.5mm] (0,0.74) ellipse [x~radius=1.85, y~radius=0.3];
+                \end{ocg}
+                % grey (OFF) icon — visible initially
+                \begin{ocg}{Favorite heart OFF}{\tl_use:N \l_mj_psficon_off_tl}{1}
+                  \path[fill=black!3] \cur;
+                  \path[draw=black!5, line~width=0.35mm] \cur;
+                \end{ocg}
+              \end{tikzpicture}
+            }%
+          }%
+        }[\dim_use:N \l_mj_favheart_icon_vshift_dim]%
+      }%
+    \group_end:
+    \ignorespaces
+  }
+
+\NewDocumentCommand \FavoriteHeartToggle { } { \mj_favorite_toggle_heart_margin: }
+% \NewDocumentCommand \FavoriteHeartToggle { } {%
+%   \int_compare:nTF { \int_use:N \g_fav_problem_ps_counter_int > 0 }
+%     { \mj_favorite_toggle_heart_margin: }
+%     { }
+% }
+
+\cs_gset_protected:Npn \mj_problem_number_box:n #1
+  {
+    \IfFavoriteProblemTF
+      {
+        \mbox{%
+          % Hearts visible when subsection FAVORITES are ON
+          \begin{ocg}{Favorites as hearts (PS ON)}{\l_mj_psfav_on_tl}{0}%
+            \rlap{%
+              \int_compare:nNnTF { #1 } < { 10 }
+                { \mytcbfitfavproblem         {\color{pnfavtxt}\textbf{\sffamily #1}} }
+                { \mytcbfitfavproblemtwodigits{\color{pnfavtxt}\textbf{\sffamily #1}} }
+            }%
+          \end{ocg}%
+          % Squares visible when subsection FAVORITES are OFF
+          \begin{ocg}{Favorites as squares (PS OFF)}{\l_mj_psfav_off_tl}{1}%
+            \mytcbfitproblem{\color{pntxt}\textbf{\sffamily #1}}
+          \end{ocg}%
+        }%
+      }
+      {
+        % Non-favorite problem: always the normal box
+        \mytcbfitproblem{\color{pntxt}\textbf{\sffamily #1}}
+      }
+  }
+
+\cs_new_protected:Npn \mj_solution_number_box:n #1
+  {
+    \IfFavoriteProblemTF
+      { \int_compare:nNnTF { #1 } < { 10 }
+        { \mytcbfitfavproblem         {\color{pnfavtxt}\textbf{\sffamily #1}} }
+        { \mytcbfitfavproblemtwodigits{\color{pnfavtxt}\textbf{\sffamily #1}} } }
+      { 
+        \IfThisProblemImportantTF { \tl_gset:Nn \g_mj_problem_num_colback_tl { importantbg } } { \tl_gset:Nn \g_mj_problem_num_colback_tl { snbg } }
+        \tl_log:N \g_mj_problem_num_colback_tl
+        \mytcbfitsolution   {\color{sntxt}\textbf{\sffamily #1}} 
+      }
+  }
+
+\cs_new_protected:Npn \mj_problem_label:
+  {
+    \hyperlink{hypersolution:\int_use:N \g_problem_ID_int}
+      { \mj_problem_number_box:n { \theproblemnumber } }
+  }
+
+\cs_new_protected:Npn \mj_solution_label:
+  {
+    \hyperlink{hyperproblem:\tl_use:N \l_problem_ID_tl}
+      { \mj_solution_number_box:n { \thesolutionnumber } }
+  }
+
+% =========================================================
+% HINT TOGGLE — PER SUBSECTION (keyed by \g_problemset_ID_int)
+% =========================================================
+
+% Per-subsection OCG name holders
+\tl_new:N \l_mj_pshint_on_tl
+\tl_new:N \l_mj_pshint_off_tl
+\tl_new:N \l_mj_pshicon_on_tl
+\tl_new:N \l_mj_pshicon_off_tl
+
+% Build OCG names from \g_problemset_ID_int
+\cs_new_protected:Npn \mj_hint_this_ps_init:
+  {
+    \tl_set:Nx \l_mj_pshint_on_tl   { mj-pshint-on-\int_use:N \g_problemset_ID_int }
+    \tl_set:Nx \l_mj_pshint_off_tl  { mj-pshint-off-\int_use:N \g_problemset_ID_int }
+    \tl_set:Nx \l_mj_pshicon_on_tl  { mj-pshicon-on-\int_use:N \g_problemset_ID_int }
+    \tl_set:Nx \l_mj_pshicon_off_tl { mj-pshicon-off-\int_use:N \g_problemset_ID_int }
+  }
+
+% -------- PER-SUBSECTION PREDECLARE (initial: all OFF) --------
+\cs_set_protected:Npn \mj_hint_this_ps_predeclare:
+  {
+    \begingroup
+      % PS master: ON layer starts hidden; OFF layer starts visible
+      \begin{ocg}{Subsection hints ON  \int_use:N\g_problemset_ID_int}{\l_mj_pshint_on_tl}{0}\end{ocg}%
+      \begin{ocg}{Subsection hints OFF \int_use:N\g_problemset_ID_int}{\l_mj_pshint_off_tl}{1}\end{ocg}%
+      % PS icon: "on" icon hidden; "off" icon visible
+      \begin{ocg}{PS Hint icon ON      \int_use:N\g_problemset_ID_int}{\l_mj_pshicon_on_tl}{0}\end{ocg}%
+      \begin{ocg}{PS Hint icon OFF     \int_use:N\g_problemset_ID_int}{\l_mj_pshicon_off_tl}{1}\end{ocg}%
+    \endgroup
+  }
+
+% Convenience: do both steps
+\cs_new_protected:Npn \mj_hint_this_ps_begin:
+  {
+    \mj_hint_this_ps_init:
+    \mj_hint_this_ps_predeclare:
+  }
+
+\dim_new:N \l_mj_ps_hint_icon_hshift_dim
+\dim_new:N \l_mj_ps_hint_icon_vshift_dim
+\dim_set:Nn \l_mj_ps_hint_icon_hshift_dim { 7mm }
+\dim_set:Nn \l_mj_ps_hint_icon_vshift_dim { 0pt }
+
+% =============== subsection margin toggle (order ON,OFF,iconON,iconOFF) ==========
+\cs_gset_protected:Npn \mj_hint_toggle_margin:
+  {
+    \group_begin:
+      \leavevmode
+      \raisebox{0pt}[0pt][0pt]{%
+        % \reversemarginpar
+        \marginnote{%
+          \makebox[\dimexpr\marginparwidth-\l_mj_ps_hint_icon_hshift_dim\relax][c]{%
+            \hspace*{\dim_use:N \l_mj_ps_hint_icon_hshift_dim}%
+            \switchocg{\l_mj_pshint_on_tl,\l_mj_pshint_off_tl,\l_mj_pshicon_on_tl,\l_mj_pshicon_off_tl}{%
+              \begin{ocg}{Hint icon on (PS)}{\l_mj_pshicon_on_tl}{0}%
+                \rlap{{\color{pnfr}\small\faLightbulb}}%
+              \end{ocg}%
+              \begin{ocg}{Hint icon off (PS)}{\l_mj_pshicon_off_tl}{1}%
+                {\color{black!5}\small\faLightbulb}%
+              \end{ocg}%
+            }%
+          }%
+        }[\dim_use:N \l_mj_ps_hint_icon_vshift_dim]%
+      }%
+    \group_end:
+    \ignorespaces
+  }
+
+% user-friendly wrapper
+\NewDocumentCommand \HintMarginToggle { } {
+  \mj_hint_toggle_margin: 
+}
+
+% \NewDocumentCommand \HintMarginToggle { } {
+%   \prop_get:NVN \g_how_many_hint_each_problem_prop { \int_use:N \g_problem_ID_int } \l_hint_icon_check_int
+%   \int_compare:nNnTF { \l_hint_icon_check_int } = { 0 } {  } {  
+%     \mj_hint_toggle_margin: 
+%   }
+% }
+
+% =============== drawer used INSIDE a tikzpicture (no \tikz here) ===============
+\cs_new_protected:Npn \__mj_hbutton_draw_inside:nn #1#2 {%
+  \gettikzxy{(current~page.east)}{\ax}{\ay}%
+  \pgfmathsetmacro{\tombolheight}{3.84}%
+  \pgfmathsetmacro{\tempyshift}{-\tombolheight*(#2 - 1)+\tombolheight/2}%
+  \pgfmathsetmacro{\tempxshift}{-\tombolheight/2}%
+  \ifcase#2
+    \PackageWarning{hbutton}{Case 0 is not valid!}%
+  \or
+    \node at (\ax,0) [inner~sep=0cm, outer~sep=0pt, anchor=center,
+      yshift=\tempyshift mm, xshift=\tempxshift mm]
+      {\protect\hyperlink{hyperhint:#1}{\includegraphics[scale=1, trim=0~0~0~0, clip]{hintbutton-\mycolortheme-1}}};
+    \node at (\ax,0) [inner~sep=0cm, outer~sep=0pt, anchor=center,
+      yshift=\tempyshift mm, xshift=\tempxshift mm]
+      {\textcolor{\hinttextcolorone}{\sffamily\bfseries\tiny #1}};
+  \or
+    \node at (\ax,0) [inner~sep=0cm, outer~sep=0pt, anchor=center,
+      yshift=\tempyshift mm, xshift=\tempxshift mm]
+      {\protect\hyperlink{hyperhint:#1}{\includegraphics[scale=1, trim=0~0~0~0, clip]{hintbutton-\mycolortheme-2}}};
+    \node at (\ax,0) [inner~sep=0cm, outer~sep=0pt, anchor=center,
+      yshift=\tempyshift mm, xshift=\tempxshift mm]
+      {\textcolor{\hinttextcolortwo}{\sffamily\bfseries\tiny #1}};
+  \or
+    \node at (\ax,0) [inner~sep=0cm, outer~sep=0pt, anchor=center,
+      yshift=\tempyshift mm, xshift=\tempxshift mm]
+      {\protect\hyperlink{hyperhint:#1}{\includegraphics[scale=1, trim=0~0~0~0, clip]{hintbutton-\mycolortheme-3}}};
+    \node at (\ax,0) [inner~sep=0cm, outer~sep=0pt, anchor=center,
+      yshift=\tempyshift mm, xshift=\tempxshift mm]
+      {\textcolor{\hinttextcolorthree}{\sffamily\bfseries\tiny #1}};
+  \or
+    \node at (\ax,0) [inner~sep=0cm, outer~sep=0pt, anchor=center,
+      yshift=\tempyshift mm, xshift=\tempxshift mm]
+      {\protect\hyperlink{hyperhint:#1}{\includegraphics[scale=1, trim=0~0~0~0, clip]{hintbutton-\mycolortheme-4}}};
+    \node at (\ax,0) [inner~sep=0cm, outer~sep=0pt, anchor=center,
+      yshift=\tempyshift mm, xshift=\tempxshift mm]
+      {\textcolor{\hinttextcolorfour}{\sffamily\bfseries\tiny #1}};
+  \else
+    \PackageWarning{hbutton}{Case value #2 not valid (should be 1-4)}%
+  \fi
+}
+
+% =============== BUTTON COPIES ================================================
+\NewDocumentCommand \hbuttonPS { m m } {%
+  \tikz[remember~picture, overlay]{%
+    \begin{scope}[ocg={ref={\tl_use:N \l_mj_pshint_on_tl}, status=invisible}]%
+      \__mj_hbutton_draw_inside:nn {#1}{#2}%
+    \end{scope}%
+  }%
+}
+
+\NewDocumentCommand \__mj_hbutton_local { m m } {%
+  \tikz[remember~picture, overlay]{%
+    \begin{scope}[ocg={ref={\tl_use:N \l_mj_phint_on_tl}, status=invisible}]%
+      \__mj_hbutton_draw_inside:nn {#1}{#2}%
+    \end{scope}%
+  }%
+}
+
+% ---------------------------------------------------------
+% Public wrapper: emit both copies, subsection-scoped
+% (swap old \hbutton for \hbuttonPS here)
+% ---------------------------------------------------------
+\NewDocumentCommand \hbuttonPP { m m } {%
+  \hbuttonPS{#1}{#2}% shows when subsection is ON
+  \__mj_hbutton_local{#1}{#2}% shows when subsection is OFF AND this problem is ON
+}
+
+% =========================================================
+% HINT PER PROBLEM TOGGLE CODE
+% =========================================================
+
+\tl_new:N \l_mj_phint_on_tl
+\tl_new:N \l_mj_phicon_on_tl
+\tl_new:N \l_mj_phicon_off_tl
+
+% Build names from your existing \g_problem_ID_int
+\cs_new_protected:Npn \mj_hint_this_problem_init:
+  {
+    \tl_set:Nx \l_mj_phint_on_tl   { mj-phint-on-\int_use:N \g_problem_ID_int }
+    \tl_set:Nx \l_mj_phicon_on_tl  { mj-phicon-on-\int_use:N \g_problem_ID_int }
+    \tl_set:Nx \l_mj_phicon_off_tl { mj-phicon-off-\int_use:N \g_problem_ID_int }
+  }
+
+% Predeclare (0pt box) so \switchocg can target them immediately
+\cs_new_protected:Npn \mj_hint_this_problem_predeclare:
+  {
+    \begingroup
+      \begin{ocg}{PHints visible \int_use:N\g_problem_ID_int}{\l_mj_phint_on_tl}{0}\end{ocg}%
+      \begin{ocg}{PHint icon ON  \int_use:N\g_problem_ID_int}{\l_mj_phicon_on_tl}{0}\end{ocg}%
+      \begin{ocg}{PHint icon OFF \int_use:N\g_problem_ID_int}{\l_mj_phicon_off_tl}{1}\end{ocg}%
+    \endgroup
+  }
+
+% Convenience: do both steps
+\cs_new_protected:Npn \mj_hint_this_problem_begin:
+  {
+    \mj_hint_this_problem_init:
+    \mj_hint_this_problem_predeclare:
+  }
+
+\dim_new:N \l_mj_ph_hint_icon_hshift_dim
+\dim_new:N \l_mj_ph_hint_icon_vshift_dim
+\dim_set:Nn \l_mj_ph_hint_icon_hshift_dim { 7mm }
+\dim_set:Nn \l_mj_ph_hint_icon_vshift_dim { 0pt }
+
+\NewDocumentCommand \SetPerProblemHintHShift { m } { \dim_set:Nn \l_mj_ph_hint_icon_hshift_dim {#1} }
+\NewDocumentCommand \SetPerProblemHintVShift { m } { \dim_set:Nn \l_mj_ph_hint_icon_vshift_dim {#1} }
+
+\cs_set_protected:Npn \mj_hint_toggle_right_this_problem:
+  {
+    \group_begin:
+      \leavevmode
+      \raisebox{0pt}[0pt][0pt]{%
+        % \reversemarginpar
+        \marginnote{%
+          % Align to right edge; then apply your horizontal shift
+          \makebox[\dimexpr\marginparwidth-\l_mj_ph_hint_icon_hshift_dim\relax][c]{%
+            \hspace*{\dim_use:N \l_mj_ph_hint_icon_hshift_dim}%
+            \switchocg{\l_mj_phint_on_tl,\l_mj_phicon_on_tl,\l_mj_phicon_off_tl}{%
+              \begin{ocg}{PHint icon ON}{\l_mj_phicon_on_tl}{0}%
+                \rlap{{\color{pnfr}\small\faLightbulb}}%
+              \end{ocg}%
+              \begin{ocg}{PHint icon OFF}{\l_mj_phicon_off_tl}{1}%
+                {\color{black!5}\small\faLightbulb}%
+              \end{ocg}%
+            }%
+          }%
+        }[\dim_use:N \l_mj_ph_hint_icon_vshift_dim]%
+      }%
+    \group_end:
+    \ignorespaces
+  }
+
+\NewDocumentCommand \HintToggleThisProblem { } {
+  \mj_hint_toggle_right_this_problem:
+}
+
+% \NewDocumentCommand \HintToggleThisProblem { } {
+%   \prop_get:NVN \g_how_many_hint_each_problem_prop { \int_use:N \g_problem_ID_int } \l_hint_icon_check_int
+%   \int_compare:nNnTF { \l_hint_icon_check_int } = { 0 } {  } {  
+%     \mj_hint_toggle_right_this_problem:
+%   }
+% }
+
+% =========================================================
+% SOURCE TOGGLE — PER PROBLEM (icon-only toggle)
+% - Clickable area: the bookmark icon under the number box
+% - Margin source text is NOT clickable; it just follows the icon state
+% =========================================================
+
+% ----- OCG name holders -----
+\tl_new:N \l_mj_psrc_on_tl          % layer: source text (visible when ON)
+\tl_new:N \l_mj_psrc_icon_on_tl     % layer: colored bookmark (visible when ON)
+\tl_new:N \l_mj_psrc_icon_off_tl    % layer: grey bookmark (visible when OFF)
+
+% Build names from \g_problem_ID_int
+\cs_new_protected:Npn \mj_source_this_problem_init:
+  {
+    \tl_set:Nx \l_mj_psrc_on_tl        { mj-psrc-on-\int_use:N \g_problem_ID_int }
+    \tl_set:Nx \l_mj_psrc_icon_on_tl   { mj-psrc-icon-on-\int_use:N \g_problem_ID_int }
+    \tl_set:Nx \l_mj_psrc_icon_off_tl  { mj-psrc-icon-off-\int_use:N \g_problem_ID_int }
+  }
+
+% Predeclare (initial state: text OFF, icon ON=hidden, icon OFF=visible)
+\cs_new_protected:Npn \mj_source_this_problem_predeclare:
+  {
+    \begingroup
+      \begin{ocg}{PSource text \int_use:N\g_problem_ID_int}{\l_mj_psrc_on_tl}{0}\end{ocg}%
+      \begin{ocg}{PSource icon ON  \int_use:N\g_problem_ID_int}{\l_mj_psrc_icon_on_tl}{0}\end{ocg}%
+      \begin{ocg}{PSource icon OFF \int_use:N\g_problem_ID_int}{\l_mj_psrc_icon_off_tl}{1}\end{ocg}%
+    \endgroup
+  }
+
+\cs_new_protected:Npn \mj_source_this_problem_begin:
+  {
+    \mj_source_this_problem_init:
+    \mj_source_this_problem_predeclare:
+  }
+
+% ----- Placement tuning for margin label -----
+\dim_new:N \l_mj_psrc_hshift_dim
+\dim_new:N \l_mj_psrc_vshift_dim
+\dim_set:Nn \l_mj_psrc_hshift_dim { 0mm }
+\dim_set:Nn \l_mj_psrc_vshift_dim { 0pt }
+
+\NewDocumentCommand \SetPerProblemSourceHShift { m } { \dim_set:Nn \l_mj_psrc_hshift_dim {#1} }
+\NewDocumentCommand \SetPerProblemSourceVShift { m } { \dim_set:Nn \l_mj_psrc_vshift_dim {#1} }
+
+% Optional tiny safety to avoid viewer clipping at the page edge
+\dim_new:N \l_mj_psrc_margin_safety_dim
+\dim_set:Nn \l_mj_psrc_margin_safety_dim { 5mm } % set to 0pt if not needed
+
+\dim_new:N \l_mj_psrc_baseline_nudge_dim
+\dim_set:Nn \l_mj_psrc_baseline_nudge_dim { 0mm }
+\NewDocumentCommand \SetPerProblemSourceBaselineNudge { m }
+  { \dim_set:Nn \l_mj_psrc_baseline_nudge_dim {#1} }
+
+\box_new:N \l_mj_psrc_linebox
+
+% Measures + perfectly centers the left-margin source block to the number box
+\box_new:N \l_mj_psrc_labelbox
+\dim_new:N \l_mj_psrc_labelwidth_dim
+\dim_new:N \l_mj_psrc_labelheight_dim
+
+% Leading (baseline skip) for the problem source text
+\dim_new:N \l_mj_psrc_leading_dim
+\dim_set:Nn \l_mj_psrc_leading_dim { 5pt } % try 3.6pt–4.2pt
+\NewDocumentCommand \SetProblemSourceLeading { m }
+  { \dim_set:Nn \l_mj_psrc_leading_dim {#1} }
+
+\cs_set_protected:Npn \mj_source_label_left_this_problem:n #1
+  {
+    \group_begin:
+      \leavevmode
+      \raisebox{0pt}[0pt][0pt]{%
+        \reversemarginpar
+
+        % Measure the label (at final width) to get its total height
+        \dim_set:Nn \l_mj_psrc_labelwidth_dim
+          { \dim_eval:n { \marginparwidth - \l_mj_psrc_margin_safety_dim } }
+        \setbox\l_mj_psrc_labelbox=\vbox{%
+          \hsize=\l_mj_psrc_labelwidth_dim
+          \noindent{\sffamily\fontsize{1}{\dim_use:N \l_mj_psrc_leading_dim}\selectfont\raggedright #1}\par
+        }%
+        \dim_set:Nn \l_mj_psrc_labelheight_dim { \ht\l_mj_psrc_labelbox } % vbox has zero depth
+
+        % Place the actual note, centered to the number box height
+        \marginnote{%
+          \begin{ocg}{PSource text}{\l_mj_psrc_on_tl}{0}%
+            \parbox[t]{\l_mj_psrc_labelwidth_dim}{%
+              \raggedright\sffamily\fontsize{6}{\dim_use:N \l_mj_psrc_leading_dim}\selectfont\color{pnfr}#1%
+            }%
+          \end{ocg}%
+        }[
+          % Absolute centering: baseline is top of the number box (minipage[t])
+          \dim_eval:n {
+            % \l_mj_psrc_vshift_dim
+            - 0.5\g_mj_pn_totalheight_dim
+            % + 0.5\l_mj_psrc_labelheight_dim
+            % + \l_mj_psrc_baseline_nudge_dim
+          }
+        ]%
+      }%
+    \group_end:
+    \ignorespaces
+  }
+
+% Public wrapper
+  \NewDocumentCommand \SourceToggleThisProblem { m } { \IfSourceIconT{ \mj_source_label_left_this_problem:n {#1} } }
+
+% --- (B) Bookmark icon below the number box ---
+% A wrapper you use *instead of* raw \mytcbfitproblem{...}.
+% It measures the box width and centers the OFF icon right beneath it.
+\newsavebox{\mjPNBox}
+\dim_new:N \l_mj_psrc_icon_vgap_dim
+\dim_set:Nn \l_mj_psrc_icon_vgap_dim { 2ex } % vertical gap under the number box
+% optional fine-tuning knob for a tiny left inset (default 0pt)
+\dim_new:N \l_mj_psrc_icon_left_inset_dim
+\dim_set:Nn \l_mj_psrc_icon_left_inset_dim { 0pt }
+\NewDocumentCommand \SetPerProblemSourceIconLeftInset { m }
+  { \dim_set:Nn \l_mj_psrc_icon_left_inset_dim {#1} }
+
+% Global: store number-box total height for centering
+\dim_new:N \g_mj_pn_totalheight_dim
+
+% \mj_problem_number_box:n {\theproblemnumber}
+
+% \NewDocumentCommand \ProblemNumberWithSourceIcon { m }
+%   {
+%     \mj_source_this_problem_begin: % ensure layers exist for this problem
+%     % \sbox{\mjPNBox}{\mytcbfitproblem{\color{pntxt}\textbf{\sffamily #1}}}%
+%     \sbox{\mjPNBox}{#1}%
+%
+%     % NEW: record total number-box height for vertical centering elsewhere
+%     \dim_gset:Nn \g_mj_pn_totalheight_dim { \dim_eval:n { \ht\mjPNBox + \dp\mjPNBox } }
+%
+%     \begin{minipage}[t]{\wd\mjPNBox}
+%       % 1) Typeset ONLY the number box; keep the minipage's height minimal
+%       \usebox{\mjPNBox}%
+%
+%       % 2) Zero-height overlay; anchor at LEFT edge of number-box width
+%       \group_begin:
+%         \leavevmode
+%         \raisebox{0pt}[0pt][0pt]{%
+%           % We are currently at the RIGHT edge; \llap backs up by \wd\mjPNBox
+%           \llap{%
+%             \makebox[\wd\mjPNBox][l]{%
+%               \hspace*{\dim_use:N \l_mj_psrc_icon_left_inset_dim}%
+%               % Drop the icon below the bottom by: depth + configured gap
+%               \raisebox{-\dimexpr \dp\mjPNBox + \l_mj_psrc_icon_vgap_dim \relax}{%
+%                 % Clickable area toggles source text + both icon layers
+%                 \switchocg{\l_mj_psrc_on_tl,\l_mj_psrc_icon_on_tl,\l_mj_psrc_icon_off_tl}{%
+%                   \begin{ocg}{PSource icon ON}{\l_mj_psrc_icon_on_tl}{0}%
+%                     \rlap{{\color{pnfr}\tiny\faBookOpen}}%
+%                   \end{ocg}%
+%                   \begin{ocg}{PSource icon OFF}{\l_mj_psrc_icon_off_tl}{1}%
+%                     {\color{black!15}\tiny\faBookOpen}%
+%                   \end{ocg}%
+%                 }%
+%               }%
+%             }%
+%           }%
+%         }%
+%       \group_end:
+%     \end{minipage}%
+%   }
+
+% =========================================================
+% DIFFICULTY TOGGLE — PER PROBLEM (icon-only toggle)
+% - Clickable area: the hotjar icon under the number box (RIGHT side)
+% - Margin difficulty text is NOT clickable; it follows the icon state
+% =========================================================
+
+\prop_new:N \g_problem_difficulty_prop
+
+% ----- OCG name holders -----
+\tl_new:N \l_mj_pdiff_on_tl          % layer: difficulty text (visible when ON)
+\tl_new:N \l_mj_pdiff_icon_on_tl     % layer: colored hotjar (visible when ON)
+\tl_new:N \l_mj_pdiff_icon_off_tl    % layer: grey hotjar (visible when OFF)
+
+% Build names from \g_problem_ID_int
+\cs_new_protected:Npn \mj_difficulty_this_problem_init:
+  {
+    \tl_set:Nx \l_mj_pdiff_on_tl        { mj-pdiff-on-\int_use:N \g_problem_ID_int }
+    \tl_set:Nx \l_mj_pdiff_icon_on_tl   { mj-pdiff-icon-on-\int_use:N \g_problem_ID_int }
+    \tl_set:Nx \l_mj_pdiff_icon_off_tl  { mj-pdiff-icon-off-\int_use:N \g_problem_ID_int }
+  }
+
+% Predeclare (initial state: text OFF, icon ON=hidden, icon OFF=visible)
+\cs_new_protected:Npn \mj_difficulty_this_problem_predeclare:
+  {
+    \begingroup
+      \begin{ocg}{PDifficulty text \int_use:N\g_problem_ID_int}{\l_mj_pdiff_on_tl}{0}\end{ocg}%
+      \begin{ocg}{PDifficulty icon ON  \int_use:N\g_problem_ID_int}{\l_mj_pdiff_icon_on_tl}{0}\end{ocg}%
+      \begin{ocg}{PDifficulty icon OFF \int_use:N\g_problem_ID_int}{\l_mj_pdiff_icon_off_tl}{1}\end{ocg}%
+    \endgroup
+  }
+
+\cs_new_protected:Npn \mj_difficulty_this_problem_begin:
+  {
+    \mj_difficulty_this_problem_init:
+    \mj_difficulty_this_problem_predeclare:
+  }
+
+% ----- Margin placement + styling (same spot as source, but BELOW it) -----
+\dim_new:N \l_mj_pdiff_margin_safety_dim
+\dim_set:Nn \l_mj_pdiff_margin_safety_dim { 7mm }  % like source; change if you want
+% \dim_set:Nn \l_mj_pdiff_margin_safety_dim { 5mm }  % like source; change if you want
+
+% Extra downward shift to sit *below* the source label (you fine-tune this)
+\dim_new:N \l_mj_pdiff_extra_down_dim
+\dim_set:Nn \l_mj_pdiff_extra_down_dim { -4mm } % adjust to taste
+% \dim_set:Nn \l_mj_pdiff_extra_down_dim { 2.9pt } % adjust to taste
+\NewDocumentCommand \SetPerProblemDifficultyExtraDown { m }
+  { \dim_set:Nn \l_mj_pdiff_extra_down_dim {#1} }
+
+% Tight leading for difficulty text (same trick as source)
+\dim_new:N \l_mj_pdiff_leading_dim
+\dim_set:Nn \l_mj_pdiff_leading_dim { 0pt } % tweak 3.6–4.2pt
+% \dim_set:Nn \l_mj_pdiff_leading_dim { 3.8pt } % tweak 3.6–4.2pt
+\NewDocumentCommand \SetProblemDifficultyLeading { m }
+  { \dim_set:Nn \l_mj_pdiff_leading_dim {#1} }
+
+\box_new:N \l_mj_pdiff_labelbox
+\dim_new:N \l_mj_pdiff_labelwidth_dim
+\dim_new:N \l_mj_pdiff_labelheight_dim
+
+\cs_generate_variant:Nn \tl_trim_spaces:n { x }
+
+\tl_new:N \l_mj_diff_tmp_tl
+
+% expansion-safe blank test: fully expand, then trim, then test
+\cs_new:Npn \mj_diff_if_blank:nTF #1#2#3
+  {
+    \tl_set:Nx \l_mj_diff_tmp_tl { #1 }
+    \tl_log:N \l_mj_diff_tmp_tl
+    \tl_if_empty:NTF \l_mj_diff_tmp_tl { #2 } { #3 }
+  }
+% Needed once (if not already present)
+\cs_generate_variant:Nn \tl_if_blank:nTF { eTF }
+
+% only called when non-blank—formats [<n> \faHotjar]
+\cs_new_protected:Npn \mj_difficulty_label_format:n #1
+  {
+    \sffamily\fontsize{6}{4}\selectfont
+    \baselineskip=4pt
+    \parskip=0pt \lineskip=0pt \lineskiplimit=-\maxdimen
+    \raggedright [#1~\fontsize{5}{2}\selectfont\faHotjar\fontsize{6}{4}\selectfont]%
+  }
+
+\cs_new_protected:Npn \mj_difficulty_label_measure:n #1
+  { \mj_diff_if_blank:nTF {#1} { } { \mj_difficulty_label_format:n { \l_mj_diff_tmp_tl } } }
+
+\cs_new_protected:Npn \mj_difficulty_label_output:n #1
+  { \mj_diff_if_blank:nTF {#1} { } { {\color{pnfr}\mj_difficulty_label_format:n { \l_mj_diff_tmp_tl }} } }
+
+% ----- Margin difficulty label (NON-clickable) -----
+% Usage: \DifficultyToggleThisProblem{D5}  or  \DifficultyToggleThisProblem{\faStar\faStar\faStar}
+\cs_set_protected:Npn \mj_difficulty_label_left_this_problem:e #1
+  {
+    % Early exit if #1 is effectively blank after expansion+trim
+    \mj_diff_if_blank:nTF {#1} { \ignorespaces } {
+      \group_begin:
+        \leavevmode
+        \raisebox{0pt}[0pt][0pt]{%
+          % \reversemarginpar
+
+          % Measure at final width
+          \dim_set:Nn \l_mj_pdiff_labelwidth_dim
+            { \dim_eval:n { \marginparwidth - \l_mj_pdiff_margin_safety_dim } }
+          \setbox\l_mj_pdiff_labelbox=\vbox{%
+            \hsize=\l_mj_pdiff_labelwidth_dim
+            \noindent{ \mj_difficulty_label_measure:n {#1} \par }%
+          }%
+          \dim_set:Nn \l_mj_pdiff_labelheight_dim { \ht\l_mj_pdiff_labelbox }
+
+          % Place the actual note (centered, then shifted if you add extra-down)
+          \marginnote{%
+            \begin{ocg}{PDifficulty text}{\l_mj_pdiff_on_tl}{0}%
+              \parbox[t]{\l_mj_pdiff_labelwidth_dim}{%
+                { \mj_difficulty_label_output:n {#1} }%
+              }%
+            \end{ocg}%
+          }[
+            \dim_eval:n {
+              0.5\g_mj_pn_totalheight_dim
+              - 0.5\l_mj_pdiff_labelheight_dim
+              + \l_mj_pdiff_extra_down_dim
+            }
+          ]%
+        }%
+      \group_end:
+      \ignorespaces
+    }
+  }
+
+% Public wrapper
+\NewDocumentCommand \DifficultyToggleThisProblem { m } { \mj_difficulty_label_left_this_problem:e {#1} }
+
+% ====== RIGHT-SIDE ICON UNDER THE NUMBER BOX (CLICKABLE) ======
+% Vertical gap under the number box (independent from source's)
+\dim_new:N \l_mj_pdiff_icon_vgap_dim
+\dim_set:Nn \l_mj_pdiff_icon_vgap_dim { 2ex }
+\NewDocumentCommand \SetPerProblemDifficultyIconVGap { m }
+  { \dim_set:Nn \l_mj_pdiff_icon_vgap_dim {#1} }
+
+% Tiny inset from the right frame of the number box
+\dim_new:N \l_mj_pdiff_icon_right_inset_dim
+\dim_set:Nn \l_mj_pdiff_icon_right_inset_dim { 0pt }
+\NewDocumentCommand \SetPerProblemDifficultyIconRightInset { m }
+  { \dim_set:Nn \l_mj_pdiff_icon_right_inset_dim {#1} }
+
+% ====== COMBINED NUMBER-BOX WRAPPER (prints box once, draws BOTH icons) ======
+% Use this instead of \ProblemNumberWithSourceIcon{...}
+\NewDocumentCommand \ProblemNumberWithSourceAndDiffIcons { m }
+  {
+    % \mj_source_this_problem_begin:
+    % \mj_difficulty_this_problem_begin:
+
+    % Your #1 is the already-typeset number box (e.g., \mytcbfitproblem{...})
+    \sbox{\mjPNBox}{#1}%
+
+    % Record total height for margin centering
+    \dim_gset:Nn \g_mj_pn_totalheight_dim { \dim_eval:n { \ht\mjPNBox + \dp\mjPNBox } }
+
+    \begin{minipage}[t]{\wd\mjPNBox}
+      \usebox{\mjPNBox}%
+
+      \IfSourceIconT {
+        \prop_get:NVN \g_problem_source_prop { \g_problem_ID_int } \l_problem_source_check_tl
+        \tl_if_empty:NTF \l_problem_source_check_tl { } {
+          % ---- LEFT overlay: SOURCE icon (your working code) ----
+          \group_begin:
+          \leavevmode
+          \raisebox{0pt}[0pt][0pt]{%
+            \llap{%
+              \makebox[\wd\mjPNBox][l]{%
+                \hspace*{\dim_use:N \l_mj_psrc_icon_left_inset_dim}%
+                \raisebox{-\dimexpr \dp\mjPNBox + \l_mj_psrc_icon_vgap_dim \relax}{%
+                  \switchocg{\l_mj_psrc_on_tl,\l_mj_psrc_icon_on_tl,\l_mj_psrc_icon_off_tl}{%
+                    \begin{ocg}{PSource icon ON}{\l_mj_psrc_icon_on_tl}{0}%
+                      \rlap{{\color{pnfr}\tiny\faBookOpen}}%
+                    \end{ocg}%
+                    \begin{ocg}{PSource icon OFF}{\l_mj_psrc_icon_off_tl}{1}%
+                      {\color{black!5}\tiny\faBookOpen}%
+                    \end{ocg}%
+                  }%
+                }%
+              }%
+            }%
+          }%
+          \group_end:
+        }
+      }
+
+      \IfDiffIconT {
+        \prop_get:NVN \g_problem_difficulty_prop { \g_problem_ID_int } \l_problem_diff_check_tl
+        \tl_if_empty:NTF \l_problem_diff_check_tl { } {
+          % ---- RIGHT overlay: DIFFICULTY icon (fixed) ----
+          \group_begin:
+          \leavevmode
+          \raisebox{0pt}[0pt][0pt]{%
+          % Current point is at the RIGHT edge; \llap backs up by \wd\mjPNBox
+            \llap{%
+              \makebox[\wd\mjPNBox][r]{%
+              % inset from the right edge (move left by this much)
+                \hspace*{-\dim_use:N \l_mj_pdiff_icon_right_inset_dim}%
+                \raisebox{-\dimexpr \dp\mjPNBox + \l_mj_pdiff_icon_vgap_dim \relax}{%
+                  \switchocg{\l_mj_pdiff_on_tl,\l_mj_pdiff_icon_on_tl,\l_mj_pdiff_icon_off_tl}{%
+                    \begin{ocg}{PDifficulty icon ON}{\l_mj_pdiff_icon_on_tl}{0}%
+                      \rlap{{\color{pnfr}\tiny\faHotjar}}%
+                    \end{ocg}%
+                    \begin{ocg}{PDifficulty icon OFF}{\l_mj_pdiff_icon_off_tl}{1}%
+                      {\color{black!5}\tiny\faHotjar}%
+                    \end{ocg}%
+                  }%
+                }%
+              }%
+            }%
+          }%
+          \group_end:
+        }
+      }
+
+    \end{minipage}%
+  }
+
+% IMPORTANT PROBLEM
+% --- put once in your package preamble ---
+\prop_new:N \g_mj_important_problem_prop
+\bool_new:N \g_mj_important_problem_bool
+\tl_new:N   \l__mj_problem_important_tl
+\tl_new:N \g_mj_problem_num_colback_tl
+
+% parser: set global "important" from <flags> (argument #3)
+\cs_new_protected:Npn \__mj_problem_update_important_from_flags:n #1
+  {
+    \tl_set:Nn \l__mj_problem_important_tl { #1 }
+
+    % compute boolean (assumes lowercase 'important'; match your fav style)
+    \bool_gset_false:N \g_mj_important_problem_bool
+    \tl_if_blank:VTF \l__mj_problem_important_tl
+      { \tl_gset:Nn \g_mj_problem_num_colback_tl { pnbg } }  % keep false
+      {
+        \tl_if_in:VnT \l__mj_problem_important_tl { important }
+          { \bool_gset_true:N \g_mj_important_problem_bool \tl_gset:Nn \g_mj_problem_num_colback_tl { importantbg } }
+      }
+
+    % store "true"/"false" snapshot for this problem ID
+    \prop_gput:Nee \g_mj_important_problem_prop
+      { \int_use:N \g_problem_ID_int }
+      { \bool_if:NTF \g_mj_important_problem_bool { true } { false } }
+  }
+
+% \NewDocumentCommand \theproblembgcolor { } {
+%   \tl_use:N \g_mj_problem_num_colback_tl
+% }
+
+\cs_new_protected:Npn \__mj_problem_update_num_colback_from_important:
+  {
+    \bool_if:NTF \g_mj_important_problem_bool
+      { \tl_gset:Nn \g_mj_problem_num_colback_tl { pnbg } }
+      { \tl_gset:Nn \g_mj_problem_num_colback_tl { importantbg } }
+  }
+
+\NewExpandableDocumentCommand \ProblemNumColback {} { \tl_use:N \g_mj_problem_num_colback_tl }
+
+% --- User-friendly conditionals (current problem) ---
+\NewDocumentCommand \IfThisProblemImportantTF { m m }
+  { \bool_if:NTF \g_mj_important_problem_bool {#1} {#2} }
+
+\NewDocumentCommand \IfThisProblemImportantT { m }
+  { \bool_if:NT  \g_mj_important_problem_bool {#1} }
+
+\NewDocumentCommand \IfThisProblemImportantF { m }
+  { \bool_if:NF \g_mj_important_problem_bool {#1} }
+
+% =========================================================
+% =========================================================
+
+\NewDocumentEnvironment { problem } { O{} D(){} D""{} D<>{} } {
+  \refstepcounter{problemnumber}
+  \int_gincr:N \g_problem_ID_int
+  \int_gset:NV \g_problem_number_int \theproblemnumber
+  \int_zero:N \l_nth_solutions_of_the_problem_int
+  \prop_gput:NVn \g_problem_source_prop { \g_problem_ID_int } { #1 }
+  \int_zero:N \l_nth_hint_of_the_problem_int
+  \__mj_problem_update_important_from_flags:n {#3}
+  \__mj_problem_update_fav_from_flags:n {#4}
+  \tl_if_blank:nTF {#2}
+    { \prop_gput:NVn \g_problem_difficulty_prop { \g_problem_ID_int } { } }
+    { \prop_gput:NVn \g_problem_difficulty_prop { \g_problem_ID_int } { #2 } }
+  \mj_hint_this_problem_begin:
+  \mj_source_this_problem_begin:
+  \mj_difficulty_this_problem_begin:
+} {}
+
+\NewDocumentEnvironment { absnopagebreak } {  } {
+  \par\nobreak\vfil\penalty0\vfilneg\vtop\bgroup
+} {
+  \par\xdef\tpd{\the\prevdepth}\egroup\prevdepth=\tpd
+}
+
+% \renewcommand{\tagform@}[1]{\color{c1}\ensuremath{\mathsf{\langle#1\rangle}}}
+% \newcounter{solusieq}
+% \newcommand{\labeleq}[1]{%
+%   \stepcounter{solusieq}%
+%   \gdef\@tag{\theequation}%
+%   \gdef\@currentlabel{\thesolusieq}%
+%   \tag{\thesolusieq}%
+%   \label{#1}%
+% }
+
+\renewcommand{\tagform@}[1]{\color{c1}\ensuremath{\mathsf{\langle#1\rangle}}}
+\newcounter{solusieq}
+
+\newcommand{\labeleq}[1]{%
+  \refstepcounter{solusieq}%
+  \gdef\@tag{\thesolusieq}%
+  \gdef\@currentlabel{\thesolusieq}%
+  \tag{\thesolusieq}%
+  \label{#1}%
+}
+
+\newcommand{\advanceenumeratelevel}{\advance\@enumdepth\@ne}
+\newcommand{\retractenumeratelevel}{\advance\@enumdepth\m@ne}
+
+\prop_new:N \g_problem_proposer_prop
+\prop_new:N \g_statement_storage_prop
+
+\NewDocumentEnvironment { statement } { O{} +b } {
+  \prop_gput:NVn \g_problem_proposer_prop { \g_problem_ID_int } { #1 }
+  \prop_gput:NVV \g_statement_storage_prop { \g_problem_ID_int } { \exp_not:n {#2} }
+
+  \prop_get:NVN \g_problem_source_prop { \g_problem_ID_int } \l_problem_source_show_tl
+  \prop_get:NVN \g_problem_difficulty_prop { \g_problem_ID_int } \l_problem_diff_show_tl
+
+  \prop_if_empty:NTF \g_how_many_solutions_each_problem_prop {
+    \prop_if_empty:NTF \g_how_many_hint_each_problem_prop {
+      \setlist[problemlist]{%
+        label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_number_box:n {\theproblemnumber}},
+        % label={\mj_problem_number_box:n {\theproblemnumber} },
+        % label=\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}},
+        ref=\theproblemnumber,
+        partopsep=0.125\baselineskip,
+        topsep=0.125\baselineskip,
+        itemsep=2.5ex,
+        leftmargin=*,
+      }
+      \advanceenumeratelevel
+      \begin{problemlist}
+        \item \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
+      \end{problemlist}
+      \retractenumeratelevel
+      \vfil\penalty-101\vfilneg
+    } {
+      \prop_if_in:NVTF \g_how_many_hint_each_problem_prop { \g_problem_ID_int } {
+        \prop_get:NVN \g_how_many_hint_each_problem_prop { \g_problem_ID_int } \l_hint_number_per_problem_tl
+        \int_compare:nNnTF { \l_hint_number_per_problem_tl } > { 0 } {
+          \prop_if_empty:NTF \g_hint_mapping_prop { } {%
+            \setlist[problemlist]{%
+              label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_number_box:n {\theproblemnumber}},
+              % label={\mj_problem_number_box:n {\theproblemnumber} },
+              % label=\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}},
+              ref=\theproblemnumber,
+              partopsep=0.125\baselineskip,
+              topsep=0.125\baselineskip,
+              itemsep=2.5ex,
+              leftmargin=*,
+            }
+            \hypertarget{hyperproblem:\int_use:N \g_problem_ID_int}{}%
+            \advanceenumeratelevel
+            \begin{problemlist}
+            \item \int_step_inline:nn { \l_hint_number_per_problem_tl } {
+                \prop_get:NeN \g_hint_mapping_prop { \int_eval:n { \g_problem_ID_int * 10 + ##1 } } \l_hint_number_after_shuffle_tl
+                \hbuttonPP{\tl_use:N \l_hint_number_after_shuffle_tl}{##1}
+              } \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\HintToggleThisProblem\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
+            \end{problemlist}
+            \retractenumeratelevel
+            \vfil\penalty-101\vfilneg
+          }
+        } {  }
+      } {
+        \setlist[problemlist]{%
+          label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_number_box:n {\theproblemnumber}},
+          % label={\mj_problem_number_box:n {\theproblemnumber} },
+          % label=\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}},
+          ref=\theproblemnumber,
+          partopsep=0.125\baselineskip,
+          topsep=0.125\baselineskip,
+          itemsep=2.5ex,
+          leftmargin=*,
+        }
+        \advanceenumeratelevel
+        \begin{problemlist}
+          \item \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
+        \end{problemlist}
+        \retractenumeratelevel
+        \vfil\penalty-101\vfilneg
+      }
+    }
+  } {
+    \prop_if_in:NVTF \g_how_many_solutions_each_problem_prop { \g_problem_ID_int } {
+      \prop_if_empty:NTF \g_how_many_hint_each_problem_prop {
+        \setlist[problemlist]{%
+          label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_label:},
+          % label={\mj_problem_label:},
+          % label=\protect\hyperlink{hypersolution:\int_use:N \g_problem_ID_int}{\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}}},
+          ref=\theproblemnumber,
+          partopsep=0.125\baselineskip,
+          topsep=0.125\baselineskip,
+          itemsep=2.5ex,
+          leftmargin=*,
+        }
+        \hypertarget{hyperproblem:\int_use:N \g_problem_ID_int}{}%
+        \advanceenumeratelevel
+        \begin{problemlist}
+        \item \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
+        \end{problemlist}
+        \retractenumeratelevel
+        \vfil\penalty-101\vfilneg
+      } {
+        \prop_if_in:NVTF \g_how_many_hint_each_problem_prop { \g_problem_ID_int } {
+          \prop_get:NVN \g_how_many_hint_each_problem_prop { \g_problem_ID_int } \l_hint_number_per_problem_tl
+          \int_compare:nNnTF { \l_hint_number_per_problem_tl } > { 0 } {
+            \prop_if_empty:NTF \g_hint_mapping_prop { } {%
+              \prop_get:NVNTF \g_mj_fav_problem_prop { \g_problem_ID_int } \l_tmpa_tl { \tl_if_eq:VnTF \l_tmpa_tl { true } {\bool_gset_true:N \g_mj_fav_problem_bool}{\bool_gset_false:N \g_mj_fav_problem_bool} } { \bool_gset_false:N \g_mj_fav_problem_bool }
+              \setlist[problemlist]{%
+                label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_label:},
+                % label={\mj_problem_label:},
+                % label=\protect\hyperlink{hypersolution:\int_use:N \g_problem_ID_int}{\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}}},
+                ref=\theproblemnumber,
+                partopsep=0.125\baselineskip,
+                topsep=0.125\baselineskip,
+                itemsep=2.5ex,
+                leftmargin=*,
+              }
+              \hypertarget{hyperproblem:\int_use:N \g_problem_ID_int}{}%
+              \advanceenumeratelevel
+              \begin{problemlist}
+              \item \int_step_inline:nn { \l_hint_number_per_problem_tl } {
+                  \prop_get:NeN \g_hint_mapping_prop { \int_eval:n { \g_problem_ID_int * 10 + ##1 } } \l_hint_number_after_shuffle_tl
+                  \hbuttonPP{\tl_use:N \l_hint_number_after_shuffle_tl}{##1}
+                } \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\HintToggleThisProblem\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
+              \end{problemlist}
+              \retractenumeratelevel
+              \vfil\penalty-101\vfilneg
+            }
+          } {  }
+        } {
+          \prop_get:NVNTF \g_mj_fav_problem_prop { \g_problem_ID_int } \l_tmpa_tl { \tl_if_eq:VnTF \l_tmpa_tl { true } {\bool_gset_true:N \g_mj_fav_problem_bool}{\bool_gset_false:N \g_mj_fav_problem_bool} } { \bool_gset_false:N \g_mj_fav_problem_bool }
+          \setlist[problemlist]{%
+            label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_label:},
+            % label={\mj_problem_label:},
+            % label=\protect\hyperlink{hypersolution:\int_use:N \g_problem_ID_int}{\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}}},
+            ref=\theproblemnumber,
+            partopsep=0.125\baselineskip,
+            topsep=0.125\baselineskip,
+            itemsep=2.5ex,
+            leftmargin=*,
+          }
+          \hypertarget{hyperproblem:\int_use:N \g_problem_ID_int}{}%
+          \advanceenumeratelevel
+          \begin{problemlist}
+            \item \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
+          \end{problemlist}
+          \retractenumeratelevel
+          \vfil\penalty-101\vfilneg
+        }
+      }
+    } {
+      \prop_if_empty:NTF \g_how_many_hint_each_problem_prop {
+        \setlist[problemlist]{%
+          label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_number_box:n {\theproblemnumber}},
+          % label={\mj_problem_number_box:n {\theproblemnumber} },
+          % label=\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}},
+          ref=\theproblemnumber,
+          partopsep=0.125\baselineskip,
+          topsep=0.125\baselineskip,
+          itemsep=2.5ex,
+          leftmargin=*,
+        }
+        \advanceenumeratelevel
+        \begin{problemlist}
+          \item \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
+        \end{problemlist}
+        \retractenumeratelevel
+        \vfil\penalty-101\vfilneg
+      } {
+        \prop_if_in:NVTF \g_how_many_hint_each_problem_prop { \g_problem_ID_int } {
+          \prop_get:NVN \g_how_many_hint_each_problem_prop { \g_problem_ID_int } \l_hint_number_per_problem_tl
+          \int_compare:nNnTF { \l_hint_number_per_problem_tl } > { 0 } {
+            \prop_if_empty:NTF \g_hint_mapping_prop { } {%
+              \setlist[problemlist]{%
+                label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_number_box:n {\theproblemnumber}},
+                % label={\mj_problem_number_box:n {\theproblemnumber} },
+                % label=\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}},
+                ref=\theproblemnumber,
+                partopsep=0.125\baselineskip,
+                topsep=0.125\baselineskip,
+                itemsep=2.5ex,
+                leftmargin=*,
+              }
+              \hypertarget{hyperproblem:\int_use:N \g_problem_ID_int}{}%
+              \advanceenumeratelevel
+              \begin{problemlist}
+              \item \int_step_inline:nn { \l_hint_number_per_problem_tl } {
+                  \prop_get:NeN \g_hint_mapping_prop { \int_eval:n { \g_problem_ID_int * 10 + ##1 } } \l_hint_number_after_shuffle_tl
+                  \hbuttonPP{\tl_use:N \l_hint_number_after_shuffle_tl}{##1}
+                } \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\HintToggleThisProblem\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
+              \end{problemlist}
+              \retractenumeratelevel
+              \vfil\penalty-101\vfilneg
+            }
+          } {  }
+        } {
+          \setlist[problemlist]{%
+            label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_number_box:n {\theproblemnumber}},
+            % label={\mj_problem_number_box:n {\theproblemnumber} },
+            % label=\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}},
+            ref=\theproblemnumber,
+            partopsep=0.125\baselineskip,
+            topsep=0.125\baselineskip,
+            itemsep=2.5ex,
+            leftmargin=*,
+          }
+          \advanceenumeratelevel
+          \begin{problemlist}
+            \item \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
+          \end{problemlist}
+          \retractenumeratelevel
+          \vfil\penalty-101\vfilneg
+        }
+      }
+    }
+  }
+} {  }
+
+\newcounter{solutionnumber}
+\setcounter{solutionnumber}{0}
+\newlist{solutionlist}{enumerate}{1}
+\setlist[solutionlist]{%
+  label=\protect\hyperlink{hyperproblem:\int_use:N \g_problem_ID_int}{\mytcbfitsolution{\color{sntxt}\textbf{\sffamily\thesolutionnumber}}},
+  ref=\thesolutionnumber,
+  partopsep=0125\baselineskip,
+  topsep=0.125\baselineskip,
+  itemsep=2.5ex,
+  leftmargin=*,
+}
+
+\prop_new:N \g_how_many_solutions_each_problem_prop
+\seq_new:N \g_solution_storage_seq
+\seq_new:N \g_printed_solution_storage_seq
+\seq_new:N \l_remaining_solution_storage_seq
+\str_new:N \g_sudah_print_section_solution_str
+\str_gset:Nn \g_sudah_print_section_solution_str {belum}
+
+\NewDocumentEnvironment { solution } { O{} D<>{} +b } {
+  \int_gincr:N \l_nth_solutions_of_the_problem_int
+  \prop_gput:NVV \g_how_many_solutions_each_problem_prop { \g_problem_ID_int } { \l_nth_solutions_of_the_problem_int }
+  \seq_gput_right:Nx \g_solution_storage_seq {{ \int_use:N \g_problem_ID_int }{ \exp_not:V \g_problemset_name_str }{ \int_use:N \g_problem_number_int }{ #1 }{ #2 }{ \exp_not:n {#3} }{ \int_use:N \l_nth_solutions_of_the_problem_int }}
+}
+
+\ExplSyntaxOff
+
+
+
+
+
+
+
+
+\NewDocumentCommand \printsolutions { O{} } {
+  \ExplSyntaxOn
+  \iow_now:Nn \@mainaux {
+    \ExplSyntaxOn
+  }
+  \prop_map_inline:Nn \g_how_many_solutions_each_problem_prop {
+    \iow_now:Nn \@mainaux {
+      \prop_gput:Nnn \g_how_many_solutions_each_problem_prop { ##1 } { ##2 }
+    }
+  }
+  \iow_now:Nn \@mainaux {
+    \ExplSyntaxOff
+  }
+
+  \tl_gset:Nn \g_tmpc_tl {#1}
+  \seq_gclear:N \g_printed_solution_storage_seq
+  \seq_clear:N \l_remaining_solution_storage_seq
+
+  \tl_if_empty:NTF \g_tmpc_tl {
+    \seq_set_eq:NN \g_printed_solution_storage_seq \g_solution_storage_seq
+  } {
+    \seq_map_inline:Nn \g_solution_storage_seq {
+      \tl_set:Nn \l_tmpd_tl {##1}
+      \tl_set:Nx \l_problem_set_check_tl {\tl_item:Nn \l_tmpd_tl {2}}
+      \str_if_eq:eeTF { \tl_to_str:N \g_tmpc_tl } { \tl_to_str:N \l_problem_set_check_tl }  {
+        \seq_gput_right:Nn \g_printed_solution_storage_seq {##1}
+      } { 
+        \seq_put_right:Nn \l_remaining_solution_storage_seq {##1}
+      }
+    }
+    \seq_set_eq:NN \g_solution_storage_seq \l_remaining_solution_storage_seq
+  }
+
+  \prop_log:N \g_problem_difficulty_prop
+
+  \tl_gset:Nn \g_current_subsection_tl {@dummysubsection}
+
+  \seq_map_inline:Nn \g_printed_solution_storage_seq {
+    \tl_set:Nn \l_tmpa_tl {##1}
+    \tl_set:Nx \l_problem_ID_tl {\tl_item:Nn \l_tmpa_tl {1}}
+    \tl_set:Nx \l_problemset_name_tl {\tl_item:Nn \l_tmpa_tl {2}}
+
+    % \tl_if_eq:enTF \l_problem_ID_tl {1} {
+    %   \section{Solusi~\str_use:N \g_problemset_handle_str}
+    % } {  }
+
+    \str_if_eq:VnTF \g_sudah_print_section_solution_str  {belum} {
+      \IfVideoTF { } { \section{Solusi} }
+      \str_gset:Nn \g_sudah_print_section_solution_str {sudah}
+    } { }
+
+    \prop_if_in:NeTF \g_problemset_handle_prop { \l_problem_ID_tl } {
+      \prop_get:NVN \g_problemset_handle_prop { \l_problem_ID_tl } \l_current_problemset_handle_tl
+      \newpage
+      \prop_get:NeN \g_problemset_handle_color_index_prop { \int_eval:n {\int_use:N \c@section + 1} } \l_current_problemset_handle_index_color_tl
+      \tl_set:Nx \l_tmpg_tl { \seq_item:Nn \g_problemset_theme_seq { \l_current_problemset_handle_index_color_tl } }
+      \exp_args:NV \setcolortheme \l_tmpg_tl
+      \seq_gpop_left:NN \g_problemset_handle_titlepage_seq \l_tmph_tl
+      \mytitle{\tl_item:Nn \l_tmph_tl {1}}
+      \mysubtitle{\tl_item:Nn \l_tmph_tl {2}}
+      \myauthor{\tl_item:Nn \l_tmph_tl {3}}
+      \mydate{\tl_item:Nn \l_tmph_tl {4}}
+      \mymaketitle
+      \IfVideoTF { } { \section{\tl_use:N \l_current_problemset_handle_tl } }
+      \str_if_eq:eeTF { \tl_to_str:N \g_current_subsection_tl } { \tl_to_str:N \l_problemset_name_tl }  {  } {
+        \IfVideoTF { } { \subsection{Solusi~\tl_use:N \l_problemset_name_tl} }
+        \tl_gset:Ne \g_current_subsection_tl {\l_problemset_name_tl}
+      }
+    } {
+      \str_if_eq:eeTF { \tl_to_str:N \g_current_subsection_tl } { \tl_to_str:N \l_problemset_name_tl }  {  } {
+        % \newpage
+        \IfVideoTF { } { \subsection{Solusi~\tl_use:N \l_problemset_name_tl} }
+        \tl_gset:Ne \g_current_subsection_tl {\l_problemset_name_tl}
+      }
+    }
+
+    \tl_set:Nx \l_problem_number_tl {\tl_item:Nn \l_tmpa_tl {3}}
+    \tl_set:Nx \l_solver_tl {\tl_item:Nn \l_tmpa_tl {4}}
+    \tl_set:Nx \l_aops_link_tl {\tl_item:Nn \l_tmpa_tl {5}} % Belum tau mau ditaruh mana
+    \tl_set:Nx \l_solution_body_tl {\tl_item:Nn \l_tmpa_tl {6}}
+    \tl_set:Nx \l_nth_solution_of_the_problem_tl {\tl_item:Nn \l_tmpa_tl {7}}
+
+    \prop_get:NVN \g_how_many_solutions_each_problem_prop { \l_problem_ID_tl } \l_solution_count_int
+    \prop_get:NVN \g_statement_storage_prop { \l_problem_ID_tl } \l_problem_statement_tl
+    \prop_get:NVN \g_problem_source_prop { \l_problem_ID_tl } \l_problem_source_tl
+    \prop_get:NVN \g_problem_proposer_prop { \l_problem_ID_tl } \l_problem_proposer_tl
+
+    \setcounter{solusieq}{0}
+    \int_gset:Nn \g_claim_number_per_solution_int {0}
+
+    \int_compare:nNnTF { \l_nth_solution_of_the_problem_tl } = {1} {
+      \prop_get:NVNTF \g_mj_fav_problem_prop { \l_problem_ID_tl } \l_tmpa_tl { \tl_if_eq:VnTF \l_tmpa_tl { true } {\bool_gset_true:N \g_mj_fav_problem_bool}{\bool_gset_false:N \g_mj_fav_problem_bool} } { \bool_gset_false:N \g_mj_fav_problem_bool }
+      \prop_get:NVNTF \g_mj_important_problem_prop { \l_problem_ID_tl } \l_tmpb_tl { \tl_if_eq:VnTF \l_tmpb_tl { true } {\bool_gset_true:N \g_mj_important_problem_bool \tl_gset:Nn \g_mj_problem_num_colback_tl { importantbg }}{\bool_gset_false:N \g_mj_important_problem_bool \tl_gset:Nn \g_mj_problem_num_colback_tl { snbg }} } { \bool_gset_false:N \g_mj_important_problem_bool \tl_gset:Nn \g_mj_problem_num_colback_tl { snbg } }
+      \setcounter{solutionnumber}{\l_problem_number_tl}%
+      \setlist[solutionlist]{%
+        label={\mj_solution_label:},
+        % label=\protect\hyperlink{hyperproblem:\l_problem_ID_tl}{\mytcbfitsolution{\color{sntxt}\textbf{\sffamily\thesolutionnumber}}},
+        leftmargin=*,
+      }%
+      % \mytcbfitsolution
+      % \mytcbheartproblem
+      % \vfil\penalty-1\vfilneg
+      % \needspace{7\baselineskip}
+      \protect\hypertarget{hypersolution:\tl_use:N \l_problem_ID_tl}{}%
+      \advanceenumeratelevel%
+      \begin{solutionlist}
+      \item \l_problem_statement_tl \par
+      \end{solutionlist}
+      \retractenumeratelevel%
+      \tl_if_empty:NTF \l_problem_source_tl {
+        \tl_if_empty:NTF \l_problem_proposer_tl { } {
+          \begin{flushright}\textit{\color{c1}(Proposed \space by \space \l_problem_proposer_tl)}\end{flushright}
+          \vspace*{-0.5\baselineskip}
+        }
+      } {
+        \tl_if_empty:NTF \l_problem_proposer_tl {
+          \begin{flushright}\textit{\color{c1}(\l_problem_source_tl)}\end{flushright}%
+          \vspace*{-0.5\baselineskip}
+        } {
+          \begin{flushright}\textit{\color{c1}(Proposed \space by \space \l_problem_proposer_tl, \space \l_problem_source_tl)}\end{flushright}
+          \vspace*{-0.5\baselineskip}
+        }
+      }
+      % \vspace*{-0.5\baselineskip}
+      \noindent{\color{c2}\dotfill}
+    }{ }
+    
+    \tl_if_empty:NTF \l_solver_tl { } {
+      \tl_set:Nx \l_tmpc_tl { \textcolor{c2}{[ \space \l_solver_tl \space ]} }
+      \tl_set:Nx \l_solver_tl {\l_tmpc_tl}
+    }
+
+    \tl_if_empty:NTF \l_aops_link_tl { 
+      \tl_set:Nn \l_aops_link_done_tl { }
+    } {
+      \tl_set:Nx \l_aops_link_done_tl { \exp_not:N \reversemarginpar \exp_not:N \marginpar{\exp_not:N \makebox[0pt][c]{\exp_not:N \hspace*{0.5\marginparsep}} \exp_not:N \makebox[\exp_not:N \marginparwidth][c]{\exp_not:N \href{\tl_use:N \l_aops_link_tl}{\exp_not:N \textcolor{c2}{\exp_not:N \sffamily \exp_not:N \bfseries \exp_not:N \scriptsize AoPS}}}} }
+    }
+
+    \int_compare:nNnTF { \l_solution_count_int } = {1} {
+      \pagebreak[1]\par\noindent\l_aops_link_done_tl\textbf{\sffamily\small\hspace*{2em}\textcolor{ \g_cthree_color_correction_str }{SOLUSI \space \faGg} \space \l_solver_tl \hspace*{1em}} \l_solution_body_tl \hfill \(\color{ \g_cthree_color_correction_str }{\blacksquare}\) \par\nopagebreak \ornamentbig{\g_cthree_color_correction_str} \par \newpage
+      % \vfil\penalty-101\vfilneg
+    }{
+      \pagebreak[1]\par\noindent\l_aops_link_done_tl\textbf{\sffamily\small\hspace*{2em}\textcolor{ \g_cthree_color_correction_str }{SOLUSI \space \l_nth_solution_of_the_problem_tl \space \faGg} \space \l_solver_tl \hspace*{1em}} \l_solution_body_tl \hfill \(\color{ \g_cthree_color_correction_str }{\blacksquare}\) \par
+      \int_compare:nNnTF { \l_nth_solution_of_the_problem_tl } = { \l_solution_count_int } {
+        \ornamentbig{\g_cthree_color_correction_str} \newpage
+        % \vfil\penalty-101\vfilneg
+      }{
+        \ornamentsmall
+        % \vfil\penalty-101\vfilneg
+      }
+    }
+  }
+  \pagebreak[0]
+  \ExplSyntaxOff
+}
+
+\ExplSyntaxOn
+
+\newcounter{hintnumber}
+\setcounter{hintnumber}{0}
+\newlist{hintlist}{enumerate}{1}
+\setlist[hintlist]{%
+  label=\mytcbfithint{\color{hntxt}\textbf{\sffamily\thehintnumber}},
+  ref=\thehintnumber,
+  partopsep=0ex,
+  topsep=0.5\baselineskip,
+  itemsep=2.5ex,
+  leftmargin=*,
+}
+
+\prop_new:N \g_how_many_hint_each_problem_prop
+\seq_new:N \g_hint_storage_seq
+\int_new:N \g_the_total_number_of_hint_int
+\prop_new:N \g_hint_mapping_prop
+\str_new:N \g_sudah_print_section_hint_str
+\str_gset:Nn \g_sudah_print_section_hint_str {belum}
+
+\NewDocumentEnvironment { hint } { +b } {
+  \int_gincr:N \l_nth_hint_of_the_problem_int
+  \int_gincr:N \g_the_total_number_of_hint_int
+  \prop_gput:NVV \g_how_many_hint_each_problem_prop { \g_problem_ID_int } { \l_nth_hint_of_the_problem_int }
+
+
+
+  \seq_gput_right:Nx \g_hint_storage_seq {{ \int_use:N \g_problem_ID_int }{ \exp_not:V \g_problemset_name_str }{ \exp_not:n {#1} }{ \int_use:N \l_nth_hint_of_the_problem_int }}
+} {  }
+
+\NewDocumentCommand \printhints {  } {
+  \iow_now:Nn \@mainaux {
+    \ExplSyntaxOn
+  }
+  \prop_map_inline:Nn \g_how_many_hint_each_problem_prop {
+    \iow_now:Nn \@mainaux {
+      \prop_gput:Nnn \g_how_many_hint_each_problem_prop { ##1 } { ##2 }
+    }
+  }
+  \iow_now:Nn \@mainaux {
+    \ExplSyntaxOff
+  }
+  \seq_shuffle:N \g_hint_storage_seq
+  \seq_map_inline:Nn \g_hint_storage_seq {
+    % \int_compare:nNnTF {\thehintnumber} = {0} {
+    %   \chapter{Hints}
+    %   \markright{\thechapter\ HINTS}
+    %   \thispagestyle{empty}
+    %   \newpage
+    %   \setcolortheme{neutral}
+    % } {  }
+
+    \str_if_eq:VnTF \g_sudah_print_section_hint_str {belum} {
+      \section{Hints}
+      \str_gset:Nn \g_sudah_print_section_hint_str {sudah}
+    } { }
+
+    \tl_set:Nn \l_tmpa_tl {##1}
+
+    \tl_set:Nx \l_problem_ID_tl {\tl_item:Nn \l_tmpa_tl {1}}
+    \tl_set:Nx \l_problemset_name_tl {\tl_item:Nn \l_tmpa_tl {2}}
+    \tl_set:Nx \l_hint_body_tl {\tl_item:Nn \l_tmpa_tl {3}}
+    \tl_set:Nx \l_nth_hint_of_the_problem_tl {\tl_item:Nn \l_tmpa_tl {4}}
+
+    \prop_get:NVN \g_how_many_hint_each_problem_prop { \l_problem_ID_tl } \l_how_many_hint_this_problem_has_int
+
+    \int_compare:nNnTF { \l_how_many_hint_this_problem_has_int } = { 0 } {  } {
+      \refstepcounter{hintnumber}
+       %haven't taken into account jika problem tdk punya hint
+      \prop_gput:Nee \g_hint_mapping_prop {\int_eval:n {\tl_use:N \l_problem_ID_tl * 10 + \tl_use:N \l_nth_hint_of_the_problem_tl}} {\thehintnumber}
+
+      \setlist[hintlist]{%
+        label=\protect\hyperlink{hyperproblem:\l_problem_ID_tl}{\mytcbfithint{\color{hntxt}\textbf{\sffamily\footnotesize\thehintnumber}}},
+        leftmargin=*,
+      }
+      \protect\hypertarget{hyperhint:\thehintnumber}{}%
+      \advanceenumeratelevel
+      \begin{hintlist}[before=\small]
+      \item \l_hint_body_tl
+      \end{hintlist}
+      \retractenumeratelevel
+      \vfil\penalty-301\vfilneg
+    }
+  }
+  \iow_now:Nn \@mainaux {
+    \ExplSyntaxOn
+  }
+  \prop_map_inline:Nn \g_hint_mapping_prop {
+    \iow_now:Nn \@mainaux {
+      \prop_gput:Nnn \g_hint_mapping_prop { ##1 } { ##2 }
+    }
+  }
+  \iow_now:Nn \@mainaux {
+    \ExplSyntaxOff
+  }
+}
+
+\ExplSyntaxOff
+\makeatother

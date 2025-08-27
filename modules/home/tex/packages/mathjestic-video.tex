@@ -1,0 +1,21 @@
+\ProvidesFile{mathjestic-video.tex}
+\ExplSyntaxOn
+
+% Global switch: default OFF
+\bool_new:N \g_mj_video_bool
+\bool_gset_false:N \g_mj_video_bool
+
+% Option: presence => ON (no key=value allowed)
+\keys_define:nn { mathjestic }
+  {
+    video .code:n            = { \bool_gset_true:N \g_mj_video_bool },
+  }
+
+% User-friendly wrappers (non-LaTeX3 style names)
+\NewDocumentCommand \IfVideoTF { m m }
+  { \bool_if:NTF \g_mj_video_bool {#1}{#2} }
+
+\NewDocumentCommand \IfVideoT { m }
+  { \bool_if:NT \g_mj_video_bool {#1} }
+
+\ExplSyntaxOff

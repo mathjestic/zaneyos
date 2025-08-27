@@ -1,0 +1,164 @@
+\ProvidesFile{mathjestic-article.tex}
+\ExplSyntaxOn
+
+\bool_new:N \g_mj_article_bool
+\bool_new:N \g_mj_article_applied_bool
+
+\cs_new_protected:Npn \mathjestic_apply_article_mode:
+  {
+    \bool_if:NT \g_mj_article_bool
+      {
+        \bool_if:NF \g_mj_article_applied_bool
+          {
+             % --- Numbering: remove chapter prefix from sections/subsections
+            \renewcommand\thesection{\arabic{section}}
+            \renewcommand\thesubsection{\thesection.\arabic{subsection}}
+            \renewcommand\thesubsubsection{\thesubsection.\arabic{subsubsection}}
+
+            % (Optional) if you number equations by section:
+            \makeatletter
+            % \@addtoreset{equation}{section}
+            \@addtoreset{figure}{section}
+            \@addtoreset{table}{section}
+            \makeatother
+            % \renewcommand\theequation{\thesection.\arabic{equation}}
+            \renewcommand\thefigure{\thesection.\arabic{figure}}
+            \renewcommand\thetable{\thesection.\arabic{table}}
+
+            % Be generous with numbering in article mode
+            \setcounter{secnumdepth}{3}
+            \setcounter{tocdepth}{2}
+
+            % --- Map \chapter -> \section (handles *, and optional short title)
+            \RenewDocumentCommand \chapter { s O{} m }
+            {
+              \IfBooleanTF{##1}
+              { \section*{##3} } % \chapter*{Title} -> \section*{Title}
+              { \section[##2]{##3} } % \chapter[Short]{Long} -> \section[Short]{Long}
+            }
+            % Make chapter marks sensible for your headers when "chapters" are gone
+            \RenewDocumentCommand \chaptermark { m } { \markright{##1} }
+            % Printed chapter number becomes empty (for safety if referenced)
+            \RenewDocumentCommand \thechapter { } { }
+
+            % --- ToC: print a section-style heading and section entries
+            \makeatletter
+            \let\mj@orig@tableofcontents\tableofcontents
+            \RenewDocumentCommand \tableofcontents { }
+            {
+              \section*{\contentsname}
+              \@mkboth{\contentsname}{\contentsname}%
+              \@starttoc{toc}
+            }
+            \makeatother
+
+            % If you use titletoc for pretty ToC entries, switch from chapter->section
+            \makeatletter
+            \@ifpackageloaded{titletoc}{%
+              % Define lengths only once
+              \@ifundefined{tocseclabcon}{\newlength{\tocseclabcon}}{}
+              \@ifundefined{tocsecleftcon}{\newlength{\tocsecleftcon}}{}
+              \setlength{\tocseclabcon}{2.3em}
+              \setlength{\tocsecleftcon}{2.3em}
+
+              % 0) Neutralize chapter template so it can't “bleed” styles
+              \titlecontents{chapter}
+              [0pt]{}{}{}{}[\addvspace{0pt}]
+
+              % 1) Sections (top-level in article mode)
+              \titlecontents{section}[\tocsecleftcon]{\color{exfr}\boldmath\bfseries\sffamily}{\contentslabel{\tocseclabcon}}{}{\hspace*{1em}\titlerule*[1pc]{.}\contentspage}
+
+              % 2) Subsections
+              \titlecontents{subsection}[\tocsubsecleftcon]{\color{exfr2}\sffamily}{\contentslabel{\tocsubseclabcon}}{}{\hspace*{1em}\titlerule*[0.5pc]{.}\contentspage}
+            }{}
+            \makeatother
+
+            % (Optional) cleveref names stay natural
+            \makeatletter
+            \@ifpackageloaded{cleveref}{
+              \crefname{section}{section}{sections}
+              \Crefname{section}{Section}{Sections}
+            % If any code accidentally labels a "chapter", make it read as section
+              \crefname{chapter}{section}{sections}
+              \Crefname{chapter}{Section}{Sections}
+            }{}
+            \makeatother
+
+            \makeatletter
+            % One-shot "chapter*-like" heading even in article mode, with your styling
+            \newcommand*\mj@chapterlikeStar[1]{%
+              \clearpage
+              \thispagestyle{fancy}%
+              % Use your existing star-chapter visual if defined
+              \@ifundefined{@makeschapterhead}
+              {\begingroup\centering\bfseries\sffamily\Large ##1\par\endgroup}
+              {\@makeschapterhead{##1}}%
+            }
+
+            % --- TOC: chapter-like heading, NO toc entry ---
+            \RenewDocumentCommand \tableofcontents {}{%
+              \mj@chapterlikeStar{\contentsname}%
+              \@starttoc{toc}%
+            }
+
+            % --- LoF/LoT (optional): same treatment, NO toc entries ---
+            \RenewDocumentCommand \listoffigures {}{%
+              \mj@chapterlikeStar{\listfigurename}%
+              \@starttoc{lof}%
+            }
+            \RenewDocumentCommand \listoftables {}{%
+              \mj@chapterlikeStar{\listtablename}%
+              \@starttoc{lot}%
+            }
+
+            % --- Bibliography ---
+            % If you use biblatex:
+            \@ifpackageloaded{biblatex}{
+              \defbibheading{bibliography}[\bibname]{%
+                \mj@chapterlikeStar{##1}%  no \addcontentsline -> stays out of ToC
+              }
+            }{
+            % Else (standard \thebibliography):
+              \RenewDocumentCommand \thebibliography { m }{%
+                \mj@chapterlikeStar{\bibname}% usually "Daftar Pustaka" via babel/polyglossia
+                \list{\@biblabel{\@arabic\c@enumiv}}{%
+                  \settowidth\labelwidth{\@biblabel{##1}}%
+                  \leftmargin\labelwidth
+                  \advance\leftmargin\labelsep
+                  \usecounter{enumiv}%
+                  \let\p@enumiv\@empty
+                  \renewcommand\theenumiv{\@arabic\c@enumiv}%
+                }%
+                \sloppy\clubpenalty4000\widowpenalty4000\sfcode`\.=\@m
+              }
+            }
+
+            \AtBeginBibliography{%
+              \markboth{}{}% clear both left and right marks so header text is blank
+            }
+            \makeatother
+          }
+      }
+  }
+
+\cs_new_protected:Npn \mathjesticApplyArticleMode { \mathjestic_apply_article_mode: }
+
+% one global flag for the whole suite
+\bool_if_exist:NF \g_mj_article_bool { \bool_new:N \g_mj_article_bool }
+
+% define the package option: [article] or [no-article]
+\keys_define:nn { mathjestic }
+  {
+    article       .bool_gset:N = \g_mj_article_bool,
+    article       .initial:n   = false,
+  }
+
+% (optional) user-facing conditionals you’ve been using
+\prg_new_conditional:Npnn \mj_if_article: { p, T, F, TF }
+  {
+    \bool_if:NTF \g_mj_article_bool { \prg_return_true: } { \prg_return_false: }
+  }
+\NewDocumentCommand \IfArticleTF { +m +m } { \mj_if_article:TF {#1}{#2} }
+\NewDocumentCommand \IfArticleT  { +m }    { \mj_if_article:T  {#1} }
+
+\ExplSyntaxOff

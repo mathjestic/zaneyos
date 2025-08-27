@@ -1,0 +1,24 @@
+\ProvidesFile{mathjestic-solution.tex}
+\ExplSyntaxOn
+
+\bool_new:N \g_mathjestic_print_solutions_bool
+
+\cs_new_protected:Npn \mathjestic_solutions_set_from_tl:n #1
+  {
+    \tl_if_blank:nTF {#1}
+      { \bool_gset_true:N \g_mathjestic_print_solutions_bool }
+      { \mathjestic_bool_set_from_tl:Nn \g_mathjestic_print_solutions_bool {#1} }
+  }
+\cs_new_protected:Npn \mathjesticSolutionsSetFromTL #1
+  { \mathjestic_solutions_set_from_tl:n {#1} }
+
+\keys_define:nn { mathjestic }
+  {
+    solutions        .code:n    = { \mathjesticSolutionsSetFromTL {#1} },
+    solutions        .initial:n = false,
+    print-solutions  .meta:n    = { solutions = #1 },
+    printsolutions   .meta:n    = { solutions = #1 },
+    sols             .meta:n    = { solutions = #1 },
+  }
+
+\ExplSyntaxOff

@@ -1,0 +1,31 @@
+\ProvidesFile{mathjestic-backmatter.tex}
+\ExplSyntaxOn
+
+\cs_new_protected:Npn \__mathjestic_print_bibliography:
+  {
+    \cs_if_exist:NTF \printbibliography
+      {
+        \clearpage
+        \bool_if:NTF \g_mj_article_bool
+          { \printbibliography[heading=subbibintoc, title={Daftar~Pustaka}] }
+          { \printbibliography[heading=bibintoc, title={Daftar~Pustaka}] }
+      }
+      {
+        \PackageWarning{mathjestic}
+          {Bibliography requested but \string\printbibliography\space not found.%
+           \MessageBreak Did you load 'biblatex'? Skipping.}
+      }
+  }
+
+\cs_new_protected:Npn \mathjestic_print_backmatter:
+  {
+    \bool_if:NT \g_mathjestic_print_hints_bool      { \clearpage \printhints }
+    \bool_if:NT \g_mathjestic_print_solutions_bool  { \clearpage \printsolutions }
+    \bool_if:NT \g_mathjestic_print_bibliography_bool
+      { \__mathjestic_print_bibliography: }
+  }
+
+\cs_new_protected:Npn \mathjesticPrintBackmatter
+  { \mathjestic_print_backmatter: }
+
+\ExplSyntaxOff

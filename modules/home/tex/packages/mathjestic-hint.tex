@@ -1,0 +1,23 @@
+\ProvidesFile{mathjestic-hint.tex}
+\ExplSyntaxOn
+
+\bool_new:N \g_mathjestic_print_hints_bool
+
+\cs_new_protected:Npn \mathjestic_hints_set_from_tl:n #1
+  {
+    \tl_if_blank:nTF {#1}
+      { \bool_gset_true:N \g_mathjestic_print_hints_bool }
+      { \mathjestic_bool_set_from_tl:Nn \g_mathjestic_print_hints_bool {#1} }
+  }
+\cs_new_protected:Npn \mathjesticHintsSetFromTL #1
+  { \mathjestic_hints_set_from_tl:n {#1} }
+
+\keys_define:nn { mathjestic }
+  {
+    hints        .code:n    = { \mathjesticHintsSetFromTL {#1} },
+    hints        .initial:n = false,
+    print-hints  .meta:n    = { hints = #1 },
+    printhints   .meta:n    = { hints = #1 },
+  }
+
+\ExplSyntaxOff

@@ -1,0 +1,812 @@
+\ProvidesPackage{mathjestictheorem}
+
+% --- Required Packages ---
+\RequirePackage{thmtools}
+\RequirePackage[framemethod=TikZ]{mdframed}
+\RequirePackage{tcolorbox}
+\tcbuselibrary{theorems, breakable, skins, fitting, most}
+\RequirePackage{fontawesome5}
+\RequirePackage{xcolor}
+\RequirePackage{tikz}
+\usetikzlibrary{calc, shadings, fadings, decorations.pathreplacing, decorations.markings}
+
+% \tikzset{
+%   mjgrad/.style n args={4}{
+%     draw=none,
+%     postaction={
+%       decorate,
+%       decoration={
+%         markings,
+%         mark=between positions 0pt and \pgfdecoratedpathlength-#4 step #4 with {
+%           \pgfmathsetmacro\pct{
+%             100 * \pgfkeysvalueof{/pgf/decoration/mark info/distance from start}
+%                 / \pgfdecoratedpathlength
+%           }
+%           \pgfsetfillcolor{#2!\pct!#3}
+%           \pgfpathcircle{\pgfpointorigin}{#1}
+%           \pgfusepath{fill}
+%         }
+%       }
+%     }
+%   }
+% }
+
+% --- Theorem Styles and Environments ---
+
+\newcounter{claimnumber}
+\setcounter{claimnumber}{0}
+
+% \NewDocumentEnvironment { claim } { +b } {
+%   Klaim \space \faLightbulb[regular]} #1
+% }{}
+
+
+
+% Corollary/Akibat Style
+% \declaretheoremstyle[
+%   spaceabove=0\parsep,
+%   spacebelow=0\parsep,
+%   headindent=0pt,
+%   headfont=\sffamily\bfseries\color{c2},
+%   notebraces={\hspace{5pt}[}{]},
+%   notefont=\sffamily\mdseries\color{c1!90},
+%   headpunct={},
+%   postheadspace=\newline,
+%   bodyfont=\normalfont,
+%   postheadhook={\textcolor{c2}{\rule[.6ex]{\linewidth}{0.75pt}}\newline},
+%   mdframed={
+%     skipabove=2\parsep, 
+%     skipbelow=0\parsep,
+%     roundcorner=12pt,
+%     linewidth=1.5pt,
+%     linecolor=c2,
+%     backgroundcolor=bg, 
+%     innertopmargin=12pt,
+%     innerbottommargin=12pt,
+%     innerleftmargin=12pt,
+%     innerrightmargin=12pt,
+%   }
+% ]{akibatstyle}
+% \declaretheorem[
+%   style=akibatstyle,
+%   title=Corollary,
+% ]{akibat}
+
+\newtcolorbox{notes}{
+  enhanced,
+  breakable,
+  sharp corners,
+  colback=ntbg,          % or your thbg
+  boxrule=0mm,
+  colframe = white, % making the base for dash line
+  % borderline = {0.4mm}{0pt}{c2, dashed, dash pattern=on 2mm off 2mm, line cap=round},
+  left=8pt,right=8pt, top=6pt,bottom=6pt,
+  left skip=2em,
+  right skip=2em,
+  before skip=2.5\parsep, after skip=2\parsep,
+  before upper*={\small\textcolor{nttxt}{\textsf{\bfseries Notes}\hspace{0.7em} {\relsize{-1}\faPen}}\hspace{0.7em}}, % inline label on first line only
+}
+
+% "Catatan" (Note) environment with mdframed
+% \declaretheoremstyle[
+%   spaceabove=0\parsep,
+%   spacebelow=0\parsep,
+%   headindent=0pt,
+%   headfont=\bfseries\sffamily\color{c3!80!black},
+%   notebraces={}{},
+%   headpunct={\hspace{1em}},
+%   postheadspace=0pt,
+%   bodyfont=\normalfont,
+%   mdframed={
+%     skipabove=2.5\parsep,
+%     skipbelow=0\parsep,
+%     rightline=true,
+%     leftline=true,
+%     topline=false,
+%     bottomline=false,
+%     roundcorner=0pt,
+%     linewidth=3pt,
+%     linecolor=c3!80!black,
+%     backgroundcolor=bg2,
+%     innertopmargin=12pt,
+%     innerbottommargin=12pt,
+%     innerleftmargin=12pt,
+%     innerrightmargin=12pt,
+%     leftmargin=2em,
+%     rightmargin=2em,
+%   }
+% ]{catatanstyle}
+% \declaretheorem[
+%   style=catatanstyle,
+%   numbered=no,
+%   name=Note \space {\relsize{-1}\faPen},
+% ]{catatan}
+
+% "Klaim" (Claim) style and environment with manual numbering
+% \declaretheoremstyle[
+%   spaceabove=0\parsep,
+%   spacebelow=0\parsep,
+%   headindent=0pt,
+%   headfont=\bfseries\sffamily\color{c2},
+%   notebraces={}{},
+%   headpunct={\hspace{1em}},
+%   postheadspace=0pt,
+%   bodyfont=\normalfont,
+%   mdframed={
+%     skipabove=2.5\parsep,
+%     skipbelow=0\parsep,
+%     rightline=false,
+%     leftline=true,
+%     topline=false,
+%     bottomline=false,
+%     roundcorner=0pt,
+%     linewidth=3pt,
+%     linecolor=c2,
+%     backgroundcolor=bg!90,
+%     innertopmargin=12pt,
+%     innerbottommargin=12pt,
+%     innerleftmargin=12pt,
+%     innerrightmargin=12pt,
+%   }
+% ]{klaimstyle}
+% \declaretheorem[
+%   style=klaimstyle,
+%   % numbered=no,
+%   name=Klaim,
+% ]{klaiminner}
+% \newenvironment{klaim}[1]{%
+%   \IfBlankTF{#1}
+%     {\renewcommand{\theklaiminner}{\unskip}}
+%     {\renewcommand\theklaiminner{#1 \space \faLightbulb[regular]}}%
+%   \klaiminner
+% }{\endklaiminner}
+
+%% Custom qedsymbol (commented)
+% \renewcommand{\qedsymbol}{\textcolor{c4}{\openbox}} % recolor qesymbol
+
+% "Bukti" (Proof) style
+\declaretheoremstyle[
+  spaceabove=0\parsep,
+  spacebelow=0\parsep,
+  headindent=1.53em,
+  headfont=\sffamily\small\bfseries\color{c2},
+  notebraces={}{},
+  headpunct={},
+  postheadspace=0.92em,
+  bodyfont=\normalfont,
+  qed = \(\color{c2}{\blacksquare}\),
+]{buktistyle}
+\declaretheorem[
+  style=buktistyle,
+  numbered=no,
+  name=BUKTI \reflectbox{\faGg},
+]{bukti}
+
+% "Solusi" (Solution) style
+\declaretheoremstyle[
+  spaceabove=0\parsep,
+  spacebelow=0\parsep,
+  headindent=1.53em,
+  headfont=\sffamily\small\bfseries\color{c3!70!c1},
+  notebraces={}{},
+  headpunct={},
+  postheadspace=0.92em,
+  bodyfont=\normalfont,
+  qed = \(\color{c3!70!c1}{\blacksquare}\),
+]{solusistyle}
+\declaretheorem[
+  style=solusistyle,
+  numbered=no,
+  name=SOLUSI \faGg,
+]{solusi}
+
+% % "Solusi" (Solution) style
+% \declaretheoremstyle[
+%   spaceabove=0\parsep,
+%   spacebelow=0\parsep,
+%   headindent=2em,
+%   headfont=\sffamily\small\bfseries\color{c3!80!black},
+%   notebraces={}{},
+%   headpunct={},
+%   postheadspace=1em,
+%   bodyfont=\normalfont,
+%   qed = \(\color{c3!80!black}{\blacksquare}\),
+% ]{solusistyle}
+% \declaretheorem[
+%   style=solusistyle,
+%   numbered=no,
+%   name=SOLUSI \faGg,
+% ]{solusi}
+
+
+% Teorema as tcolorbox theorem
+% \newtcbtheorem[]{teorema1}{Teorema}{
+%   separator sign={\hspace{8pt}{\relsize{-2}\raisebox{0.8pt}{\faGem[regular]}}\hspace{3pt}},
+%   description delimiters={}{},
+%   description color=c2,
+%   description font=\sffamily\bfseries,
+%   terminator sign={},
+%   label separator=*,
+%   unbreakable,
+%   enlargepage flexible=\baselineskip,
+%   enhanced jigsaw,
+%   sharp corners,
+%   attach boxed title to top center={yshift=-0.75pt-\tcboxedtitleheight/2,yshifttext=1pt-\tcboxedtitleheight/2},
+%   fonttitle=\bfseries\sffamily,
+%   boxrule = 1.5pt,
+%   top = 10pt, % inner sep
+%   bottom = 10pt,
+%   left = 10pt,
+%   right = 10pt,
+%   coltitle = c2!90,
+%     %colback=bg,
+%   colframe=c2,
+%   colbacktitle=bg,
+%   interior style={top color = bg, bottom color = bg!80},
+%   frame style={top color=c2, bottom color=c3},
+%     %height fixed for=first and middle,
+%   boxed title style={
+%     enhanced,
+%     boxrule=0.25mm,
+%     frame code={
+%       \path[tcb fill frame] ([xshift=-4mm]frame.west) -- (frame.north west)
+%       -- (frame.north east) -- ([xshift=4mm]frame.east)
+%     -- (frame.south east) -- (frame.south west) -- cycle; },
+%     interior code={ \path[tcb fill interior] ([xshift=-3mm]interior.west)
+%       -- (interior.north west) -- (interior.north east)
+%       -- ([xshift=3mm]interior.east) -- (interior.south east) -- (interior.south west)
+%     -- cycle;}
+%   }
+% }
+% {th1}
+
+% "Contoh" (Example) as tcolorbox theorem
+% \newtcbtheorem[]{contoh}{\color{extxt}\hspace{2pt}Contoh\hspace{5pt}}{
+%   separator sign={\hspace{12pt}{\relsize{-3}\raisebox{2pt}{\rotatebox{90}{\faEthereum}}}\hspace{7pt}},
+%   description delimiters={}{},
+%   description color=extxt,
+%   description font=\normalsize\bfseries\sffamily,
+%   terminator sign={},
+%   label separator=*,
+%   unbreakable,
+%   enlargepage flexible=\baselineskip,
+%   skin=enhancedlast jigsaw,
+%   sharp corners,
+%   attach boxed title to top left={xshift=-4mm, yshift=-0.5mm},
+%   fonttitle=\bfseries\montserrat\small,
+%   toprule=0pt,
+%   bottomrule=0pt,
+%   rightrule=0pt,
+%   leftrule=4pt,
+%   top = 10pt,
+%   left = 10pt,
+%   right = 10pt,
+%   bottom = 10pt,
+%   %before upper={\parindent 1em},
+%   colback=exbg,
+%   % colframe=c3!80!black,
+%   % colbacktitle=c3!80!black,
+%   colframe=exfr,
+%   colbacktitle=exfr,
+%   boxed title style={
+%     frame code={
+%       \fill[exfr](frame.south west)--+(4.2mm,-1.5mm)--+(4.2mm,1.5mm)--cycle;
+%       \fill[exfr](frame.south west)--(frame.north west)--(frame.north east)--([xshift=3mm]frame.east)--(frame.south east)--cycle;
+%       \fill[exfr2]([xshift=2mm]frame.north east) -- ([xshift=5mm]frame.north east) -- ([xshift=8mm]frame.east) -- ([xshift=5mm]frame.south east) -- ([xshift=2mm]frame.south east) -- ([xshift=5mm]frame.east) -- cycle;
+%       % \fill[c4!80]([xshift=2mm]frame.north east) -- ([xshift=5mm]frame.north east) -- ([xshift=8mm]frame.east) -- ([xshift=5mm]frame.south east) -- ([xshift=2mm]frame.south east) -- ([xshift=5mm]frame.east) -- cycle;
+%       \fill[exfr3]([xshift=7mm]frame.north east) -- ([xshift=10mm]frame.north east) -- ([xshift=13mm]frame.east) -- ([xshift=10mm]frame.south east) -- ([xshift=7mm]frame.south east) -- ([xshift=10mm]frame.east) -- cycle;
+%       % \fill[c5!70]([xshift=7mm]frame.north east) -- ([xshift=10mm]frame.north east) -- ([xshift=13mm]frame.east) -- ([xshift=10mm]frame.south east) -- ([xshift=7mm]frame.south east) -- ([xshift=10mm]frame.east) -- cycle;
+%       % \fill[c3!40]([xshift=12mm]frame.north east) -- ([xshift=15mm]frame.north east) -- ([xshift=18mm]frame.east) -- ([xshift=15mm]frame.south east) -- ([xshift=12mm]frame.south east) -- ([xshift=15mm]frame.east) -- cycle;
+%       % \fill[c6!60]([xshift=12mm]frame.north east) -- ([xshift=15mm]frame.north east) -- ([xshift=18mm]frame.east) -- ([xshift=15mm]frame.south east) -- ([xshift=12mm]frame.south east) -- ([xshift=15mm]frame.east) -- cycle;
+%     }
+%   }
+% }
+% {ex}
+
+% % "Contoh" (Example) as tcolorbox theorem
+% \newtcbtheorem[]{contoh}{\hspace{2pt}Contoh}{
+%   separator sign={\hspace{8pt}{\relsize{-1}\faEthereum}\hspace{3pt}},
+%   description delimiters={}{},
+%   description color=c6!40,
+%   description font=\sffamily\bfseries,
+%   terminator sign={},
+%   label separator=*,
+%   unbreakable,
+%   enlargepage flexible=\baselineskip,
+%   skin=enhancedlast jigsaw,
+%   sharp corners,
+%   attach boxed title to top left={xshift=-4mm, yshift=-0.5mm},
+%   fonttitle=\bfseries\sffamily,
+%   toprule=0pt,
+%   bottomrule=0pt,
+%   rightrule=0pt,
+%   leftrule=4pt,
+%   top = 10pt,
+%   left = 10pt,
+%   right = 10pt,
+%   bottom = 10pt,
+%   %before upper={\parindent 1em},
+%   colback=bg2,
+%   % colframe=c3!80!black,
+%   % colbacktitle=c3!80!black,
+%   colframe=c3,
+%   colbacktitle=c3,
+%   boxed title style={
+%     frame code={
+%       \fill[c3](frame.south west)--+(4.2mm,-1.5mm)--+(4.2mm,1.5mm)--cycle;
+%       \fill[c3](frame.south west)--(frame.north west)--(frame.north east)--([xshift=3mm]frame.east)--(frame.south east)--cycle;
+%       \fill[c3!80]([xshift=2mm]frame.north east) -- ([xshift=5mm]frame.north east) -- ([xshift=8mm]frame.east) -- ([xshift=5mm]frame.south east) -- ([xshift=2mm]frame.south east) -- ([xshift=5mm]frame.east) -- cycle;
+%       % \fill[c4!80]([xshift=2mm]frame.north east) -- ([xshift=5mm]frame.north east) -- ([xshift=8mm]frame.east) -- ([xshift=5mm]frame.south east) -- ([xshift=2mm]frame.south east) -- ([xshift=5mm]frame.east) -- cycle;
+%       \fill[c3!60]([xshift=7mm]frame.north east) -- ([xshift=10mm]frame.north east) -- ([xshift=13mm]frame.east) -- ([xshift=10mm]frame.south east) -- ([xshift=7mm]frame.south east) -- ([xshift=10mm]frame.east) -- cycle;
+%       % \fill[c5!70]([xshift=7mm]frame.north east) -- ([xshift=10mm]frame.north east) -- ([xshift=13mm]frame.east) -- ([xshift=10mm]frame.south east) -- ([xshift=7mm]frame.south east) -- ([xshift=10mm]frame.east) -- cycle;
+%       % \fill[c3!40]([xshift=12mm]frame.north east) -- ([xshift=15mm]frame.north east) -- ([xshift=18mm]frame.east) -- ([xshift=15mm]frame.south east) -- ([xshift=12mm]frame.south east) -- ([xshift=15mm]frame.east) -- cycle;
+%       % \fill[c6!60]([xshift=12mm]frame.north east) -- ([xshift=15mm]frame.north east) -- ([xshift=18mm]frame.east) -- ([xshift=15mm]frame.south east) -- ([xshift=12mm]frame.south east) -- ([xshift=15mm]frame.east) -- cycle;
+%     }
+%   }
+% }
+% {ex}
+
+% \pgfdeclareverticalshading{mj-topborder}{100bp}{
+%   color(0bp)=(black);
+%   color(20bp)=(c2);
+%   color(40bp)=(c3);
+%   color(60bp)=(c4);
+%   color(80bp)=(c5);
+%   color(100bp)=(c6)
+% }
+
+% \pgfdeclareverticalshading{mj-topborder}{100bp}{
+%   color(0bp)=(black);
+%   color(25bp)=(black);
+%   color(30bp)=(red);
+%   color(40bp)=(blue);
+%   color(60bp)=(green);
+%   color(80bp)=(yellow);
+%   color(100bp)=(magenta)
+% }
+
+% snap/interpolate along an edge A→B at fraction t, store as a named point N
+\newcommand{\mjFracCoord}[4]{% t, N, A, B
+  \ifdim #1pt<.00001pt
+    \coordinate (#2) at (#3);
+  \else\ifdim #1pt>0.99999pt
+    \coordinate (#2) at (#4);
+  \else
+    \coordinate (#2) at ($(#3)!#1!(#4)$);
+  \fi\fi
+}
+
+% draw a left→right gradient strip along the TOP edge with segment list
+% \newcommand{\mjGradientTopSegments}[2]{% height, segments
+%   \pgfmathsetlengthmacro{\lw}{#1}%
+%   \foreach \L/\R/\a/\b in {#2}{%
+%     \mjFracCoord{\a}{mjA}{frame.north west}{frame.north east}%
+%     \mjFracCoord{\b}{mjB}{frame.north west}{frame.north east}%
+%     \path[
+%       shade, shading=axis, draw=none,
+%       left color=\L, right color=\R,
+%       shading angle=90 % your L→R convention
+%     ] (mjA) rectangle ([yshift=-\lw]mjB);
+%   }%
+% }
+
+
+
+\newcommand{\mjGradientLeftSegments}[2]{%
+  \pgfmathsetlengthmacro{\lw}{#1}%
+  \foreach \Top/\Bottom/\a/\b in {#2}{%
+    \mjFracCoord{\a}{mjA}{frame.north west}{frame.south west}%
+    \mjFracCoord{\b}{mjB}{frame.north west}{frame.south west}%
+    \path[
+      shade, shading=axis, draw=none,
+      top color=\Top, bottom color=\Bottom,
+      shading angle=0 % your setup: 0 = top→bottom
+    ] (mjA) rectangle ([xshift=\lw]mjB);
+  }%
+}
+
+\newcommand{\mjGradientBottomSegments}[2]{%
+  \pgfmathsetlengthmacro{\lw}{#1}%
+  \foreach \L/\R/\a/\b in {#2}{%
+    \mjFracCoord{\a}{mjA}{frame.south west}{frame.south east}%
+    \mjFracCoord{\b}{mjB}{frame.south west}{frame.south east}%
+    \path[
+      shade, shading=axis, draw=none,
+      left color=\L, right color=\R,
+      shading angle=90 % your convention: 90 = left→right
+    ] ([yshift=\lw]mjA) rectangle (mjB); % extend UP from bottom edge
+  }%
+}
+
+\newcommand{\mjGradientRightSegments}[2]{%
+  \pgfmathsetlengthmacro{\lw}{#1}%
+  \foreach \Top/\Bottom/\a/\b in {#2}{%
+    \mjFracCoord{\a}{mjA}{frame.north east}{frame.south east}%
+    \mjFracCoord{\b}{mjB}{frame.north east}{frame.south east}%
+    \path[
+      shade, shading=axis, draw=none,
+      top color=\Top, bottom color=\Bottom,
+      shading angle=0 % your convention: 0 = top→bottom
+    ] ([xshift=-\lw]mjA) rectangle (mjB); % extend LEFT from right edge
+  }%
+}
+
+
+% ([yshift={\lw/2}]mjA) rectangle ([yshift=-{\lw/2}]mjB);
+
+% \newcommand{\mjGradientTopTitleSegments}[2]{% height, segments
+%   \pgfmathsetlengthmacro{\lw}{#1}%
+%   \foreach \L/\R/\a/\b in {#2}{%
+%     \mjFracCoord{\a}{mjA}{title.north west}{title.north east}%
+%     \mjFracCoord{\b}{mjB}{title.north west}{title.north east}%
+%     \path[
+%       shade, shading=axis, draw=none,
+%       left color=\L, right color=\R,
+%       shading angle=90 % your L→R convention
+%     ] (mjA) rectangle ([yshift=-\lw]mjB);
+%   }%
+% }
+
+
+
+\newcommand{\mjGradientBottomTitleSegments}[2]{% height, segments
+  \pgfmathsetlengthmacro{\lw}{#1}%
+  \foreach \L/\R/\a/\b in {#2}{%
+    \mjFracCoord{\a}{mjA}{title.south west}{title.south east}%
+    \mjFracCoord{\b}{mjB}{title.south west}{title.south east}%
+    \path[
+      shade, shading=axis, draw=none,
+      left color=\L, right color=\R,
+      shading angle=90 % your L→R convention
+      ] ([yshift=\lw]mjA) rectangle (mjB);
+  }%
+}
+
+\newcommand{\mjGradientTopLeftTitleSegments}[2]{% height, segments
+  \pgfmathsetlengthmacro{\lw}{#1}%
+  \foreach \L/\R/\a/\b in {#2}{%
+    \mjFracCoord{\a}{mjA}{[xshift=-4mm]title.west}{title.north west}%
+    \mjFracCoord{\b}{mjB}{[xshift=-4mm]title.west}{title.north west}%
+    \path[
+      shade, shading=axis, draw=none,
+      left color=\L, right color=\R,
+      shading angle=45 % your L→R convention
+    ] ([yshift={\lw/2}]mjA) rectangle ([yshift=-{\lw/2}]mjB);
+  }%
+}
+
+
+\newcommand{\mjGradientTopLeftSegments}[2]{% height, segments
+  \pgfmathsetlengthmacro{\lw}{#1}%
+  \foreach \L/\R/\a/\b in {#2}{%
+    \mjFracCoord{\a}{mjA}{frame.north west}{[xshift=-0mm]title.west}%
+    \mjFracCoord{\b}{mjB}{frame.north west}{[xshift=-0mm]title.west}%
+    \path[
+      shade, shading=axis, draw=none,
+      left color=\L, right color=\R,
+      shading angle=90 % your L→R convention
+    ] ([yshift={\lw/2}]mjA) rectangle ([yshift=-{\lw/2}]mjB);
+  }%
+}
+
+\newcommand{\mjGradientTopRightSegments}[2]{% height, segments
+  \pgfmathsetlengthmacro{\lw}{#1}%
+  \foreach \L/\R/\a/\b in {#2}{%
+    \mjFracCoord{\a}{mjA}{[xshift=0mm]title.east}{frame.north east}%
+    \mjFracCoord{\b}{mjB}{[xshift=0mm]title.east}{frame.north east}%
+    \path[
+      shade, shading=axis, draw=none,
+      left color=\L, right color=\R,
+      shading angle=90 % your L→R convention
+    ] ([yshift={\lw/2}]mjA) rectangle ([yshift=-{\lw/2}]mjB);
+  }%
+}
+
+% Multi-stop diagonal gradient from raw coord #3 -> raw coord #4
+% #1 = thickness
+% #2 = segments  L/R/a/b  (a,b in 0..1 along the diagonal)
+% #3 = FROM target (raw, e.g. [xshift=-4mm]title.west)
+% #4 = TO   target (raw, e.g. title.north west)
+\newcommand{\mjGradientDiagSegments}[4]{%
+  \pgfmathsetlengthmacro{\lw}{#1}%
+  \foreach \L/\R/\a/\b in {#2}{%
+    % endpoints along the diagonal (snaps 0/1 via your helper)
+    \mjFracCoord{\a}{mjA}{#3}{#4}%
+    \mjFracCoord{\b}{mjB}{#3}{#4}%
+    % numeric coords of mjA,mjB
+    \path (mjA); \pgfgetlastxy{\Ax}{\Ay}%
+    \path (mjB); \pgfgetlastxy{\Bx}{\By}%
+    % angle & length of the segment
+    \pgfmathsetmacro{\mjAngle}{atan2(\By-\Ay,\Bx-\Ax)}%
+    \pgfmathsetlengthmacro{\mjLen}{veclen(\Bx-\Ax,\By-\Ay)}%
+    % draw a thin rotated rectangle with axis shading
+    \begin{scope}[shift={(mjA)}, rotate=\mjAngle]%
+      \path[
+        shade, shading=axis, draw=none,
+        left color=\L, right color=\R,
+        shading angle=90 % along the strip
+      ] (-.1pt,0) rectangle (\mjLen+.1pt,-\lw);
+    \end{scope}%
+  }%
+}
+
+\newtcbtheorem[]{contoh}{\color{extxt}\hspace{2pt}Contoh\hspace{5pt}}{
+  separator sign={\hspace{12pt}{\relsize{-3}\raisebox{2pt}{\rotatebox{90}{\faEthereum}}}\hspace{7pt}},
+  description delimiters={}{},
+  description color=extxt,
+  description font=\normalsize\bfseries\sffamily,
+  terminator sign={},
+  label separator=*,
+  unbreakable,
+  enlargepage flexible=\baselineskip,
+  skin=enhancedlast jigsaw,
+  sharp corners,
+  attach boxed title to top left={xshift=-4mm, yshift=-0.5mm},
+  fonttitle=\bfseries\montserrat\small,
+  toprule=0pt,
+  bottomrule=0pt,
+  rightrule=0pt,
+  leftrule=4pt,
+  top = 10pt,
+  left = 10pt,
+  right = 10pt,
+  bottom = 10pt,
+  before skip=2.5\parsep, after skip=2\parsep,
+  %before upper={\parindent 1em},
+  colback=exbg,
+  % colframe=c3!80!black,
+  % colbacktitle=c3!80!black,
+  colframe=exfr,
+  colbacktitle=exfr,
+  boxed title style={
+    frame code={
+      \fill[exfr](frame.south west)--+(4.2mm,-1.5mm)--+(4.2mm,1.5mm)--cycle;
+      \fill[exfr](frame.south west)--(frame.north west)--(frame.north east)--([xshift=3mm]frame.east)--(frame.south east)--cycle;
+      \fill[exfr2]([xshift=2mm]frame.north east) -- ([xshift=5mm]frame.north east) -- ([xshift=8mm]frame.east) -- ([xshift=5mm]frame.south east) -- ([xshift=2mm]frame.south east) -- ([xshift=5mm]frame.east) -- cycle;
+      % \fill[c4!80]([xshift=2mm]frame.north east) -- ([xshift=5mm]frame.north east) -- ([xshift=8mm]frame.east) -- ([xshift=5mm]frame.south east) -- ([xshift=2mm]frame.south east) -- ([xshift=5mm]frame.east) -- cycle;
+      \fill[exfr3]([xshift=7mm]frame.north east) -- ([xshift=10mm]frame.north east) -- ([xshift=13mm]frame.east) -- ([xshift=10mm]frame.south east) -- ([xshift=7mm]frame.south east) -- ([xshift=10mm]frame.east) -- cycle;
+      % \fill[c5!70]([xshift=7mm]frame.north east) -- ([xshift=10mm]frame.north east) -- ([xshift=13mm]frame.east) -- ([xshift=10mm]frame.south east) -- ([xshift=7mm]frame.south east) -- ([xshift=10mm]frame.east) -- cycle;
+      % \fill[c3!40]([xshift=12mm]frame.north east) -- ([xshift=15mm]frame.north east) -- ([xshift=18mm]frame.east) -- ([xshift=15mm]frame.south east) -- ([xshift=12mm]frame.south east) -- ([xshift=15mm]frame.east) -- cycle;
+      % \fill[c6!60]([xshift=12mm]frame.north east) -- ([xshift=15mm]frame.north east) -- ([xshift=18mm]frame.east) -- ([xshift=15mm]frame.south east) -- ([xshift=12mm]frame.south east) -- ([xshift=15mm]frame.east) -- cycle;
+    }
+  },
+  overlay unbroken={
+    \mjGradientLeftSegments{4pt}{%
+      exfr/exfr/0/0.2,
+      exfr/exfr2/0.2/0.6,
+      exfr2/exfr3/0.6/1
+    }
+  }
+}
+{ex}
+
+% widths for gradient “strokes”
+\newlength{\mjTitleBorderWidth}
+\newlength{\mjTitleBorderHeightUp}
+\newlength{\mjBodyBorderWidth}
+\newlength{\Ynorth}
+\newlength{\Ywest}
+\newlength{\OutmostLength}
+\newlength{\OuterLength}
+\newlength{\Xwest}
+\newlength{\XwestAgain}
+\newlength{\XwestRule}
+\newlength{\XwestRuleDown}
+
+% defaults
+\setlength{\mjTitleBorderWidth}{0.5mm}
+\setlength{\mjTitleBorderHeightUp}{1mm}
+\setlength{\mjBodyBorderWidth}{0.5mm}
+\setlength{\OutmostLength}{2mm}
+\setlength{\OuterLength}{1mm}
+\def\mjScale{1.2}
+
+\newcommand{\mjGradientTopTitleSegments}[2]{% height, segments
+  \pgfmathsetlengthmacro{\lw}{#1}%
+  \foreach \L/\R/\a/\b in {#2}{%
+    \mjFracCoord{\a}{mjA}{[yshift=\mjTitleBorderHeightUp]title.north west}{[yshift=\mjTitleBorderHeightUp]title.north east}%
+    \mjFracCoord{\b}{mjB}{[yshift=\mjTitleBorderHeightUp]title.north west}{[yshift=\mjTitleBorderHeightUp]title.north east}%
+    \path[
+      shade, shading=axis, draw=none,
+      left color=\L, right color=\R,
+      shading angle=90 % your L→R convention
+    ] (mjA) rectangle ([yshift=-\lw]mjB);
+  }%
+}
+
+% \newtcbtheorem[]{teorema}{\color{thtxt}Teorema\hspace{5pt}}{
+
+\newtcbtheorem[]{teorema}{\color{thtxt}Teorema\hspace{5pt}}{
+  separator sign={\hspace{12pt}{\relsize{-3}\raisebox{1.3pt}{\faGem[regular]}}\hspace{7pt}},
+  description delimiters={}{},
+  description color=thtxt,
+  description font=\sffamily\normalsize\bfseries,
+  terminator sign={},
+  label separator=*,
+  unbreakable,
+  enlargepage flexible=\baselineskip,
+  skin=enhancedlast jigsaw,
+  sharp corners,
+  fonttitle=\bfseries\montserrat\small,
+  boxrule=0mm,
+  top = 10pt,
+  left = 10pt,
+  right = 10pt,
+  bottom = 10pt,
+  colback=thbg,
+  coltitle = c1,
+  colframe=c1,
+  toprule=0pt,
+  before skip=2.5\parsep, after skip=2\parsep,
+  attach boxed title to top center={yshift=-\tcboxedtitleheight/2, yshifttext=-\tcboxedtitleheight/2},
+  frame style={top color=c1, bottom color=c1},
+  boxed title style={
+    enhanced,
+    sharp corners,
+    boxrule=0pt,
+    colback=c1,
+    frame code={
+      \pgfextracty{\Ynorth}{\pgfpointanchor{frame}{north west}}
+      \pgfextracty{\Ywest }{\pgfpointanchor{frame}{west}}
+      \pgfmathsetlengthmacro{\dy}{\Ynorth-\Ywest}
+      \pgfmathsetlength{\XwestRule}{(sqrt(2)-1)*(\mjTitleBorderHeightUp)}
+      \pgfmathsetlength{\XwestRuleDown}{(sqrt(2)-1)*(\mjTitleBorderHeightUp-\mjTitleBorderWidth)}
+      \pgfmathsetlength{\Xwest}{sqrt(2)*(\mjTitleBorderHeightUp-\mjTitleBorderWidth)}
+      \pgfmathsetlength{\XwestAgain}{sqrt(2)*(\mjTitleBorderHeightUp)}
+      \path[tcb fill frame] ([xshift=-\dy]frame.west) -- (frame.north west) -- (frame.north east) -- ([xshift=\dy]frame.east) -- (frame.south east) -- (frame.south west) -- cycle; 
+      % \path[tcb fill frame] ([xshift=-4mm]frame.west) -- (frame.north west) -- (frame.north east) -- ([xshift=4mm]frame.east) -- (frame.south east) -- (frame.south west) -- cycle; 
+      % \fill[tcb fill frame, fill=c3] ([yshift=1mm]frame.north west) -- ([yshift=1mm]frame.north east) -- ([xshift=5mm]frame.east) -- ([xshift=4.5mm]frame.east) -- ([yshift=0.5mm]frame.north east) -- ([yshift=0.5mm]frame.north west) -- ([xshift=-4.5mm]frame.west) -- ([xshift=-5mm]frame.west) -- cycle;
+      % \fill[tcb fill frame, fill=c1] ([yshift=\mjTitleBorderHeightUp,xshift=-\XwestRule]frame.north west) -- ([yshift=\mjTitleBorderHeightUp, xshift=2mm]frame.north west) -- ([yshift=\mjTitleBorderHeightUp-\mjTitleBorderWidth, xshift=2mm]frame.north west) -- ([yshift=\mjTitleBorderHeightUp-\mjTitleBorderWidth,xshift=-\XwestRuleDown]frame.north west) -- ([xshift=-\dy-\Xwest]frame.west) -- ([xshift=-\dy-\XwestAgain]frame.west) -- cycle;
+    },
+  },
+  overlay unbroken={
+    % \mjGradientTopTitleSegments{\mjTitleBorderWidth}{%
+    %   c1/c1/0/0.1,
+    %   c1/c2/0.1/0.2,
+    %   c2/c3/0.2/0.3,
+    %   c3/c4/0.3/0.4,
+    %   c4/c5/0.4/0.5,
+    %   c5/c4/0.5/0.6,
+    %   c4/c3/0.6/0.7,
+    %   c3/c2/0.7/0.8,
+    %   c2/c1/0.8/0.9,
+    %   c1/c1/0.9/1
+    % }
+    \mjGradientTopLeftSegments{\mjBodyBorderWidth}{%
+      c1/c1/0/0.1,
+      c1/c2/0.1/0.2,
+      c2/c3/0.2/0.3,
+      c3/c4/0.3/0.4,
+      c4/c5/0.4/0.5,
+      c5/c4/0.5/0.6,
+      c4/c3/0.6/0.7,
+      c3/c2/0.7/0.8,
+      c2/c1/0.8/0.9,
+      c1/c1/0.9/1
+    }
+    \mjGradientTopRightSegments{\mjBodyBorderWidth}{%
+      c1/c1/0/0.1,
+      c1/c2/0.1/0.2,
+      c2/c3/0.2/0.3,
+      c3/c4/0.3/0.4,
+      c4/c5/0.4/0.5,
+      c5/c4/0.5/0.6,
+      c4/c3/0.6/0.7,
+      c3/c2/0.7/0.8,
+      c2/c1/0.8/0.9,
+      c1/c1/0.9/1
+    }
+    \mjGradientBottomSegments{\mjBodyBorderWidth}{%
+      c1/c1/0/0.083333,
+      c1/c2/0.083333/0.166667,
+      c2/c3/0.166667/0.25,
+      c3/c4/0.25/0.333333,
+      c4/c3/0.333333/0.416667,
+      c3/c2/0.416667/0.5,
+      c2/c3/0.5/0.583333,
+      c3/c4/0.583333/0.666667,
+      c4/c3/0.666667/0.75,
+      c3/c2/0.75/0.833333,
+      c2/c1/0.833333/0.916667,
+      c1/c1/0.916667/1
+      % c1/c1/0/0.0625,
+      % c1/c2/0.0625/0.125,
+      % c2/c3/0.125/0.1875,
+      % c3/c4/0.1875/0.25,
+      % c4/c5/0.25/0.3125,
+      % c5/c4/0.3125/0.375,
+      % c4/c3/0.375/0.4375,
+      % c3/c2/0.4375/0.5,
+      % c2/c3/0.5/0.5625,
+      % c3/c4/0.5625/0.625,
+      % c4/c5/0.625/0.6875,
+      % c5/c4/0.6875/0.75,
+      % c4/c3/0.75/0.8125,
+      % c3/c2/0.8125/0.875,
+      % c2/c1/0.875/0.9375,
+      % c1/c1/0.9375/1
+    }
+    \mjGradientLeftSegments{\mjBodyBorderWidth}{%
+      c1/c1/0/0.1,
+      c1/c2/0.1/0.2,
+      c2/c3/0.2/0.3,
+      c3/c4/0.3/0.4,
+      c4/c5/0.4/0.5,
+      c5/c4/0.5/0.6,
+      c4/c3/0.6/0.7,
+      c3/c2/0.7/0.8,
+      c2/c1/0.8/0.9,
+      c1/c1/0.9/1
+    }
+    \mjGradientRightSegments{\mjBodyBorderWidth}{%
+      c1/c1/0/0.1,
+      c1/c2/0.1/0.2,
+      c2/c3/0.2/0.3,
+      c3/c4/0.3/0.4,
+      c4/c5/0.4/0.5,
+      c5/c4/0.5/0.6,
+      c4/c3/0.6/0.7,
+      c3/c2/0.7/0.8,
+      c2/c1/0.8/0.9,
+      c1/c1/0.9/1
+    }
+  },
+}
+{th}
+
+% \newtcbtheorem[]{teorema}{Teorema}{
+%   separator sign={\hspace{8pt}{\relsize{-2}\raisebox{0.8pt}{\faGem[regular]}}\hspace{3pt}},
+%   description delimiters={}{},
+%   description color=c6!40,
+%   description font=\sffamily\bfseries,
+%   terminator sign={},
+%   label separator=*,
+%   unbreakable,
+%   enlargepage flexible=\baselineskip,
+%   skin=enhancedlast jigsaw,
+%   sharp corners,
+%   attach boxed title to top center={xshift=0mm, yshift=0mm},
+%   fonttitle=\bfseries\sffamily,
+%   boxrule=0.25mm,
+%   top = 10pt,
+%   left = 10pt,
+%   right = 10pt,
+%   bottom = 10pt,
+%   %before upper={\parindent 1em},
+%   colback=bg,
+%   colframe=c2,
+%   colbacktitle=c2,
+%   overlay unbroken={
+%     \draw[line width=0.25mm, color=c2] 
+%       (frame.north west) -- (frame.north east);
+%   },
+%   frame style={top color=c2, bottom color=c3},
+%   boxed title style={
+%     sharp corners,
+%     boxrule=0pt,
+%     frame code={
+%       \newcommand{\rectsep}{0.3}
+%       \newcommand{\rectwidth}{0.3}
+%       \newcommand{\boxheight}{6.38} % boxed title height tapi manual
+%       \newcommand{\decayrate}{0.085}
+%       \newcommand{\minrectheight}{0.1}
+%       \foreach \n in {1,2,...,25}
+%       {
+%         \tikzmath{
+%           \xabove = (\rectsep + \rectwidth)*\n;
+%           \xbelow = \xabove - \rectwidth;
+%           \rectheightraw = \boxheight * exp(-\decayrate * (\n-0.5));
+%           \rectheight = max(\minrectheight, \rectheightraw);
+%           \yabove = \boxheight - \rectheight;
+%         }
+%         \fill[c2] 
+%           ([xshift=-\xbelow mm]frame.south west) 
+%           rectangle ([xshift=-\xabove mm, yshift=-\yabove mm]frame.north west);
+%         \fill[c2] 
+%           ([xshift=\xbelow mm]frame.south east) 
+%           rectangle ([xshift=\xabove mm, yshift=-\yabove mm]frame.north east);
+%       }
+%     }
+%   }
+% }
+% {th}

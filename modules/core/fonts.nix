@@ -8,6 +8,7 @@
       font-awesome
       symbola
       material-icons
+      montserrat
       fira-code
       fira-code-symbols
     ];

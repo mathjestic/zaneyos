@@ -1,0 +1,25 @@
+\ProvidesFile{mathjestic-difficulty.tex}
+\ExplSyntaxOn
+
+% Global switch: default OFF unless option is present
+\bool_new:N \g_mj_difficon_bool
+\bool_gset_false:N \g_mj_difficon_bool
+
+% Option: presence => ON (no key=value)
+\keys_define:nn { mathjestic }
+  {
+    difficon .code:n = { \bool_gset_true:N \g_mj_difficon_bool },
+  }
+
+% Conditionals
+\prg_new_conditional:Npnn \mj_if_difficon: { p, T, F, TF }
+  { \bool_if:NTF \g_mj_difficon_bool { \prg_return_true: } { \prg_return_false: } }
+
+\NewDocumentCommand \IfDiffIconTF { m m } { \mj_if_difficon:TF {#1}{#2} }
+\NewDocumentCommand \IfDiffIconT  { m }   { \mj_if_difficon:T  {#1} }
+
+% (optional) debug to terminal
+\AtBeginDocument{
+  \iow_term:x { [mathjestic] difficon = \bool_if:NTF \g_mj_difficon_bool {true}{false} }
+}
+\ExplSyntaxOff

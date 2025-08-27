@@ -1,0 +1,147 @@
+\ProvidesFile{mathjestic-preface.tex}
+\ExplSyntaxOn
+
+\bool_new:N \g_mathjestic_print_preface_bool
+\seq_new:N  \g_mathjestic_preface_seq
+\clist_new:N \l__mathjestic_preface_items_clist
+\cs_generate_variant:Nn \seq_if_in:NnF     { NVF }
+\cs_generate_variant:Nn \seq_gput_right:Nn { NV  }
+
+\cs_new_protected:Npn \mathjestic_include_preface:n #1
+  {
+    \clearpage
+    \str_case:nnF {#1}
+      {
+        {about}   { \subfile{preface/about.tex} }
+        {mybooks} { \subfile{preface/mybooks.tex} }
+        {myclass} { \subfile{preface/myclass.tex} }
+      }
+      { \PackageWarning{mathjesticpbook}{Unknown preface include '~#1~' ignored} }
+  }
+
+\cs_new_protected:Npn \mathjestic_preface_normalize_item:nN #1#2
+  {
+    % normalize input -> \l_tmpa_tl
+    \tl_set:Nx \l_tmpa_tl { \tl_lower_case:n { \tl_trim_spaces:n {#1} } }
+    % default: clear the output var
+    \tl_clear:N #2
+    % blank => keep cleared (skip)
+    \tl_if_blank:VTF \l_tmpa_tl
+      { }
+      {
+        % numbers -> names; accept names
+        \str_case:VnF \l_tmpa_tl
+          {
+            {1}       { \tl_set:Nn #2 { about } }
+            {2}       { \tl_set:Nn #2 { mybooks } }
+            {3}       { \tl_set:Nn #2 { myclass } }
+            {about}   { \tl_set:NV #2 \l_tmpa_tl }
+            {mybooks} { \tl_set:NV #2 \l_tmpa_tl }
+            {myclass} { \tl_set:NV #2 \l_tmpa_tl }
+          }
+          {
+            \PackageWarning{mathjesticpbook}
+              {Unknown preface item '~\l_tmpa_tl~' ignored}
+          }
+      }
+  }
+
+\cs_new_protected:Npn \mathjestic_preface_set_from_tl:n #1
+  {
+    \tl_set:Nn \l_tmpb_tl {#1} % original for warnings
+
+    % normalize whole value: trim/lower + strip surrounding parentheses
+    \tl_set:Nx \l_tmpa_tl { \tl_lower_case:n { \tl_trim_spaces:n {#1} } }
+    % \regex_replace_once:nnN { \A\(\s* } {} \l_tmpa_tl
+    % \regex_replace_once:nnN { \s*\)\Z } {} \l_tmpa_tl
+    \regex_replace_all:nnN { \s*;\s* | \s*\|\s* } { , } \l_tmpa_tl
+
+    % blank -> all three
+    \tl_if_blank:VTF \l_tmpa_tl
+      {
+        \bool_gset_true:N \g_mathjestic_print_preface_bool
+        \seq_gset_from_clist:Nn \g_mathjestic_preface_seq { about, mybooks, myclass }
+      }
+      {
+        % truthy/falsey quick paths
+        \str_case:VnF \l_tmpa_tl
+          {
+            {true}  { \bool_gset_true:N  \g_mathjestic_print_preface_bool
+                      \seq_gset_from_clist:Nn \g_mathjestic_preface_seq { about, mybooks, myclass } }
+            {yes}   { \bool_gset_true:N  \g_mathjestic_print_preface_bool
+                      \seq_gset_from_clist:Nn \g_mathjestic_preface_seq { about, mybooks, myclass } }
+            {on}    { \bool_gset_true:N  \g_mathjestic_print_preface_bool
+                      \seq_gset_from_clist:Nn \g_mathjestic_preface_seq { about, mybooks, myclass } }
+            {false} { \bool_gset_false:N \g_mathjestic_print_preface_bool \seq_gclear:N \g_mathjestic_preface_seq }
+            {no}    { \bool_gset_false:N \g_mathjestic_print_preface_bool \seq_gclear:N \g_mathjestic_preface_seq }
+            {off}   { \bool_gset_false:N \g_mathjestic_print_preface_bool \seq_gclear:N \g_mathjestic_preface_seq }
+            {0}     { \bool_gset_false:N \g_mathjestic_print_preface_bool \seq_gclear:N \g_mathjestic_preface_seq }
+          }
+          {
+            % treat as comma-list; items may be names or 1/2/3; dedup + preserve order
+            \bool_gset_true:N \g_mathjestic_print_preface_bool
+            \seq_gclear:N \g_mathjestic_preface_seq
+
+            \clist_set:Nx \l__mathjestic_preface_items_clist { \l_tmpa_tl }
+
+            \clist_map_inline:Nn \l__mathjestic_preface_items_clist
+              {
+                \mathjestic_preface_normalize_item:nN {##1} \l_tmpc_tl
+                \tl_if_blank:VTF \l_tmpc_tl
+                { }% skip blanks/unknowns
+                {
+                  \seq_if_in:NVF \g_mathjestic_preface_seq \l_tmpc_tl
+                  { \seq_gput_right:NV \g_mathjestic_preface_seq \l_tmpc_tl }
+                }
+              }
+
+            % if nothing valid, default to all (warn once)
+            \seq_if_empty:NT \g_mathjestic_preface_seq
+              {
+                \PackageWarning{mathjesticpbook}
+                  {No valid preface items in '~\l_tmpb_tl~'. Using all.}
+                \seq_gset_from_clist:Nn \g_mathjestic_preface_seq { about, mybooks, myclass }
+              }
+          }
+      }
+  }
+
+\cs_set_protected:Npn \mathjestic_print_preface_block:
+  {
+    \bool_if:NTF \g_mj_article_bool
+      {
+        % --- Article mode: Preface as a section (no chapter counter hacks)
+        \section*{Preface}
+        \addcontentsline{toc}{section}{Preface}
+        \seq_map_indexed_inline:Nn \g_mathjestic_preface_seq
+          {
+            \int_compare:nNnT {##1} > {1} { \par\bigskip } % paragraph gap between items
+            \mathjestic_include_preface:n {##2}
+          }
+      }
+      {
+        % --- Book mode: your original behavior
+        \setcounter{chapter}{-1}
+        \chapter{Preface}
+        \seq_map_indexed_inline:Nn \g_mathjestic_preface_seq
+          {
+            \int_compare:nNnT {##1} > {1} { \clearpage }
+            \mathjestic_include_preface:n {##2}
+          }
+      }
+  }
+
+% letters-only wrapper (safe in key bodies)
+\cs_new_protected:Npn \mathjesticPrefaceSetFromTL #1
+  { \mathjestic_preface_set_from_tl:n {#1} }
+
+\keys_define:nn { mathjestic }
+  {
+    preface         .code:n    = { \mathjesticPrefaceSetFromTL {#1} },
+    preface         .initial:n = false,
+    prefaces        .meta:n    = { preface = #1 },
+    print-preface   .meta:n    = { preface = #1 },
+    print-prefaces  .meta:n    = { preface = #1 },
+  }
+
+\ExplSyntaxOff

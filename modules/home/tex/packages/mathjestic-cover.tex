@@ -1,0 +1,49 @@
+\ProvidesFile{mathjestic-cover.tex}
+\ExplSyntaxOn
+
+\bool_new:N \g_mathjestic_print_cover_bool
+
+\cs_new_protected:Npn \mathjestic_cover_set_from_tl:n #1
+  {
+    \tl_set:Nx \l_tmpa_tl { \tl_lower_case:n {#1} }
+
+    \tl_if_blank:VTF \l_tmpa_tl
+      {
+        \bool_gset_true:N \g_mathjestic_print_cover_bool
+        \PassOptionsToPackage{cover = ovalx}{mathjesticcover}
+      }
+      {
+        \str_case:VnF \l_tmpa_tl
+          {
+            {true}  { \bool_gset_true:N  \g_mathjestic_print_cover_bool
+                      \PassOptionsToPackage{cover = ovalx}{mathjesticcover} }
+            {yes}   { \bool_gset_true:N  \g_mathjestic_print_cover_bool
+                      \PassOptionsToPackage{cover = ovalx}{mathjesticcover} }
+            {on}    { \bool_gset_true:N  \g_mathjestic_print_cover_bool
+                      \PassOptionsToPackage{cover = ovalx}{mathjesticcover} }
+            {1}     { \bool_gset_true:N  \g_mathjestic_print_cover_bool
+                      \PassOptionsToPackage{cover = ovalx}{mathjesticcover} }
+            {false} { \bool_gset_false:N \g_mathjestic_print_cover_bool }
+            {no}    { \bool_gset_false:N \g_mathjestic_print_cover_bool }
+            {off}   { \bool_gset_false:N \g_mathjestic_print_cover_bool }
+            {0}     { \bool_gset_false:N \g_mathjestic_print_cover_bool }
+          }
+          {
+            \bool_gset_true:N \g_mathjestic_print_cover_bool
+            \PassOptionsToPackage{cover = \tl_use:N \l_tmpa_tl}{mathjesticcover}
+          }
+      }
+  }
+
+\cs_new_protected:Npn \mathjesticCoverSetFromTL #1
+  { \mathjestic_cover_set_from_tl:n {#1} }
+
+\keys_define:nn { mathjestic }
+  {
+    cover        .code:n = { \mathjesticCoverSetFromTL {#1} },
+    cover-design .meta:n = { cover = #1 },
+    cover design .meta:n = { cover = #1 },
+    coverdesign  .meta:n = { cover = #1 },
+  }
+
+\ExplSyntaxOff

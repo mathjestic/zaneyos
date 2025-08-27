@@ -1,0 +1,45 @@
+\ProvidesFile{mathjestic-toc.tex}
+\ExplSyntaxOn
+
+\bool_new:N \g_mathjestic_print_toc_bool
+
+\cs_new_protected:Npn \mathjestic_bool_set_from_tl:Nn #1#2
+  {
+    \tl_lower_case:n
+      {
+        \str_case:nnF {#2}
+          {
+            {true}  { \bool_gset_true:N  #1 }
+            {yes}   { \bool_gset_true:N  #1 }
+            {on}    { \bool_gset_true:N  #1 }
+            {1}     { \bool_gset_true:N  #1 }
+            {false} { \bool_gset_false:N #1 }
+            {no}    { \bool_gset_false:N #1 }
+            {off}   { \bool_gset_false:N #1 }
+            {0}     { \bool_gset_false:N #1 }
+          }
+          {
+            \bool_gset_true:N #1
+          }
+      }
+  }
+
+\cs_new_protected:Npn \mathjestic_toc_set_from_tl:n #1
+  {
+    \tl_if_blank:nTF {#1}
+      { \bool_gset_true:N \g_mathjestic_print_toc_bool }
+      { \mathjestic_bool_set_from_tl:Nn \g_mathjestic_print_toc_bool {#1} }
+  }
+
+\cs_new_protected:Npn \mathjesticTocSetFromTL #1
+  { \mathjestic_toc_set_from_tl:n {#1} }
+
+\keys_define:nn { mathjestic }
+  {
+    toc .code:n       = { \mathjesticTocSetFromTL {#1} },
+    toc .initial:n = false,
+    print-toc .meta:n = { toc = #1 },
+    printtoc  .meta:n = { toc = #1 },
+  }
+
+\ExplSyntaxOff

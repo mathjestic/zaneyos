@@ -1,0 +1,107 @@
+\ProvidesFile{mathjestic-headericon.tex}
+\ExplSyntaxOn
+
+\seq_new:N  \g_mathjestic_headericon_seq
+\clist_new:N \l__mathjestic_headericon_items_clist
+\cs_generate_variant:Nn \seq_if_in:NnF     { NVF }
+\cs_generate_variant:Nn \seq_gput_right:Nn { NV  }
+
+\cs_new_protected:Npn \mathjestic_headericon_normalize_item:nN #1#2
+  {
+    \tl_set:Nx \l_tmpa_tl { \tl_lower_case:n { \tl_trim_spaces:n {#1} } }
+    \tl_clear:N #2
+    \tl_if_blank:VTF \l_tmpa_tl { }{
+      \str_case:VnF \l_tmpa_tl
+        {
+          {1}         { \tl_set:Nn #2 { ig } }
+          {ig}        { \tl_set:Nn #2 { ig } }
+          {instagram} { \tl_set:Nn #2 { ig } }
+
+          {2}         { \tl_set:Nn #2 { wa } }
+          {wa}        { \tl_set:Nn #2 { wa } }
+          {whatsapp}  { \tl_set:Nn #2 { wa } }
+
+          {3}         { \tl_set:Nn #2 { tt } }
+          {tt}        { \tl_set:Nn #2 { tt } }
+          {tiktok}    { \tl_set:Nn #2 { tt } }
+
+          {4}         { \tl_set:Nn #2 { yt } }
+          {yt}        { \tl_set:Nn #2 { yt } }
+          {youtube}   { \tl_set:Nn #2 { yt } }
+
+          {5}         { \tl_set:Nn #2 { web } }
+          {web}       { \tl_set:Nn #2 { web } }
+          {website}   { \tl_set:Nn #2 { web } }
+        }
+        {
+          \PackageWarning{mathjesticpbook}
+            {Unknown headericon item '~\l_tmpa_tl~' ignored}
+        }
+    }
+  }
+
+\cs_new_protected:Npn \mathjestic_headericon_set_from_tl:n #1
+  {
+    \tl_set:Nn \l_tmpb_tl {#1} % for diagnostics
+
+    \tl_set:Nx \l_tmpa_tl { \tl_lower_case:n { \tl_trim_spaces:n {#1} } }
+    \regex_replace_all:nnN { \s*;\s* | \s*\|\s* } { , } \l_tmpa_tl
+
+    % blank -> ALL
+    \tl_if_blank:VTF \l_tmpa_tl
+      {
+        \seq_gset_from_clist:Nn \g_mathjestic_headericon_seq { ig, wa, tt, yt, web }
+      }
+      {
+        % quick true/false
+        \str_case:VnF \l_tmpa_tl
+          {
+            {all}  { \seq_gset_from_clist:Nn \g_mathjestic_headericon_seq { ig, wa, tt, yt, web } }
+            {true} { \seq_gset_from_clist:Nn \g_mathjestic_headericon_seq { ig, wa, tt, yt, web } }
+            {yes}  { \seq_gset_from_clist:Nn \g_mathjestic_headericon_seq { ig, wa, tt, yt, web } }
+            {on}   { \seq_gset_from_clist:Nn \g_mathjestic_headericon_seq { ig, wa, tt, yt, web } }
+
+            {none} { \seq_gclear:N \g_mathjestic_headericon_seq }
+            {false}{ \seq_gclear:N \g_mathjestic_headericon_seq }
+            {no}   { \seq_gclear:N \g_mathjestic_headericon_seq }
+            {off}  { \seq_gclear:N \g_mathjestic_headericon_seq }
+            {0}    { \seq_gclear:N \g_mathjestic_headericon_seq }
+          }
+          {
+            % treat as comma-list of items/numbers; dedup, preserve order
+            \seq_gclear:N \g_mathjestic_headericon_seq
+            \clist_set:Nx \l__mathjestic_headericon_items_clist { \l_tmpa_tl }
+            \clist_map_inline:Nn \l__mathjestic_headericon_items_clist
+              {
+                \mathjestic_headericon_normalize_item:nN {##1} \l_tmpc_tl
+                \tl_if_blank:VTF \l_tmpc_tl { }{
+                  \seq_if_in:NVF \g_mathjestic_headericon_seq \l_tmpc_tl
+                    { \seq_gput_right:NV \g_mathjestic_headericon_seq \l_tmpc_tl }
+                }
+              }
+            \seq_if_empty:NT \g_mathjestic_headericon_seq
+              {
+                \PackageWarning{mathjesticpbook}
+                  {No valid headericon items in '~\l_tmpb_tl~'. Using all.}
+                \seq_gset_from_clist:Nn \g_mathjestic_headericon_seq { ig, wa, tt, yt, web }
+              }
+          }
+      }
+  }
+
+\cs_new_protected:Npn \mathjesticHeaderIconSetFromTL #1
+  { \mathjestic_headericon_set_from_tl:n {#1} }
+
+\cs_set_protected:Npn \mathjestic_headericon_if_in:nT #1#2
+  {
+    \tl_set:Nn \l_tmpa_tl {#1}
+    \seq_if_in:NeTF \g_mathjestic_headericon_seq { \l_tmpa_tl } { #2 } { }
+  }
+
+\keys_define:nn { mathjestic }
+  {
+    headericon .code:n    = { \mathjesticHeaderIconSetFromTL {#1} },
+    headericon .initial:n = all,
+  }
+
+\ExplSyntaxOff

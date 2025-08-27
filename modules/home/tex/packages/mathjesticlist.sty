@@ -1,0 +1,22 @@
+\ProvidesPackage{mathjesticlist}[2025/08/16 Mathjestic: list styles]
+% Needs theme colors c2,c3,c4 -> load AFTER mathjesticcolor.
+\RequirePackage{enumitem}
+\RequirePackage{relsize}
+\RequirePackage{wasysym}
+\RequirePackage{fontawesome5} % for \faCircle, \faPlay, \faStop, \faStar
+\renewcommand\RSsmallest{3pt}
+
+% Level styles (use your theme colors)
+\setlist[enumerate,1]{label=\color{c2}\sffamily\textbf{(\arabic*)},itemsep=1ex,parsep=0.75ex}
+\setlist[enumerate,2]{label=\color{c3}\sffamily\textbf{(\alph*)},topsep=1ex,itemsep=1ex,parsep=0.75ex}
+\setlist[enumerate,3]{label=\color{c4}\sffamily\textbf{(\roman*)},topsep=1ex,itemsep=1ex,parsep=0.75ex}
+
+\setlist[itemize]{itemsep=1ex,parsep=0.75ex}
+\setlist[itemize,1]{label=\color{c2}\relsize{-5}\raisebox{1ex}{\faCircle}}
+\setlist[itemize,2]{label=\color{c3}\relsize{-5}\raisebox{1ex}{\faPlay}, topsep=1ex}
+\setlist[itemize,3]{label=\color{c4}\relsize{-5}\raisebox{1ex}{\faStop}, topsep=1ex}
+\setlist[itemize,4]{label=\color{c2}\relsize{-5}\raisebox{1ex}{\faStar}, topsep=1ex}
+
+% "nomorbox" style
+\newlist{nomorbox}{enumerate}{10}
+\setlist[nomorbox]{label=\color{c2}\framebox{\sffamily\textbf{\arabic*}},itemsep=0ex,leftmargin=*,labelindent=2em}

@@ -1,0 +1,75 @@
+\ProvidesPackage{mathjesticbibli}[2025/08/16 BibLaTeX setup for Mathjestic]
+\RequirePackage{expl3}
+
+% Forward defaults + any user options to biblatex, then load it
+\PassOptionsToPackage{backend=biber,style=alphabetic,giveninits=true,%
+  uniquename=init,maxalphanames=1,minalphanames=1,backref=true}{biblatex}
+\DeclareOption*{\PassOptionsToPackage{\CurrentOption}{biblatex}}
+\ProcessOptions\relax
+\RequirePackage{biblatex}
+
+% Default resource (add more in the document or another package if you like)
+\addbibresource{refs.bib}
+
+% Handy alias
+\providecommand{\codecite}{\parencite}
+
+% Spacing between label [Al09] and entry
+\setlength{\biblabelsep}{2em}
+
+% Size for codes like [Al09]
+\providecommand*\bibcodesize{\scriptsize}
+
+% Brackets sized with the code
+\renewcommand*{\mkbibbrackets}[1]{%
+  \begingroup\bibcodesize
+  \bibopenbracket#1\bibclosebracket
+  \endgroup
+}
+
+% In-text [Al09] colorized with c2 from mathjesticcolor
+\DeclareFieldFormat{labelalpha}{{\bibcodesize\textbf{\textcolor{exfr2}{#1}}}}
+\DeclareFieldFormat{extraalpha}{{\bibcodesize\textbf{\textcolor{exfr2}{#1}}}}
+
+% How [Al09] is built: 2 letters + last two digits of year
+\DeclareLabelalphaTemplate{%
+  \labelelement{\field[strwidth=2,strside=left]{labelname}}
+  \labelelement{\field[strwidth=2,strside=right]{year}}
+}
+
+% URL/DOI fields (blue links inside the bibliography)
+\DeclareFieldFormat{url}{\mkbibacro{URL}\addcolon\space
+  \href{#1}{\textcolor{blue}{\url{#1}}}}
+\DeclareFieldFormat{doi}{\mkbibacro{DOI}\addcolon\space
+  \href{https://doi.org/#1}{\textcolor{blue}{\url{#1}}}}
+
+% Backref wording (biblatex adds the parentheses)
+\DefineBibliographyStrings{english}{
+  backrefpage  = {cited p\adddot},
+  backrefpages = {cited pp\adddot},
+}
+
+% Rename heading
+\DefineBibliographyStrings{english}{bibliography = {Daftar Pustaka}}
+
+% Tuning inside the bibliography list
+\AtBeginBibliography{%
+  \sloppy
+  % label printed in the bib list: bold + smaller (brackets added by mkbibbrackets)
+  \DeclareFieldFormat{labelalpha}{{\bibcodesize\textbf{\textcolor{exfr2}{#1}}}}
+  \DeclareFieldFormat{extraalpha}{{\bibcodesize\textbf{\textcolor{exfr2}{#1}}}}
+  % crucial: make the *measurement* use the same size *including brackets*
+  \DeclareFieldFormat{labelalphawidth}{\mkbibbrackets{{\bibcodesize\textbf{#1}}}}
+  % author names in small caps
+  \renewcommand*{\mkbibnamefamily}[1]{\textsc{#1}}%
+  \renewcommand*{\mkbibnamegiven}[1]{\textsc{#1}}%
+  \renewcommand*{\mkbibnameprefix}[1]{\textsc{#1}}%
+  \renewcommand*{\mkbibnamesuffix}[1]{\textsc{#1}}%
+  % style for backref page list
+  \DeclareListFormat{pageref}{%
+    \ifhyperref
+      {\hyperlink{page.#1}{\textcolor{c2}{#1}}}%
+      {\textcolor{exfr2}{#1}}%
+    \ifnumless{\value{listcount}}{\value{listtotal}}{\addcomma\space}{}%
+  }%
+}

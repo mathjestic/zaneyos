@@ -4,7 +4,7 @@
       enable = true;
       defaultEditor = true;
     };
-    firefox.enable = false; # Firefox is not installed by default
+    firefox.enable = true; # Firefox is not installed by default
     dconf.enable = true;
     seahorse.enable = true;
     hyprland.enable = true; #create desktop file and depedencies if you switch to GUI login MGR
@@ -24,7 +24,7 @@
     amfora # Fancy Terminal Browser For Gemini Protocol
     appimage-run # Needed For AppImage Support
     bottom # btop like util
-    brave # Brave Browser
+    # brave # Brave Browser
     brightnessctl # For Screen Brightness Control
     cmatrix # Matrix Movie Effect In Terminal
     cowsay # Great Fun Terminal Program
@@ -34,6 +34,7 @@
     eza # Beautiful ls Replacement
     ffmpeg # Terminal Video / Audio Editing
     file-roller # Archive Manager
+    gdown
     gdu # graphical disk usage
     gedit # Simple Graphical Text Editor
     gimp # Great Photo Editor
@@ -49,16 +50,16 @@
     lm_sensors # Used For Getting Hardware Temps
     lolcat # Add Colors To Your Terminal Command Output
     lshw # Detailed Hardware Information
-    mpv # Incredible Video Player
+    # mpv # Incredible Video Player
     ncdu # Disk Usage Analyzer With Ncurses Interface
     nixfmt-rfc-style # Nix Formatter
     onefetch #shows current build info and stats
     pavucontrol # For Editing Audio Levels & Devices
     pciutils # Collection Of Tools For Inspecting PCI Devices
-    picard # For Changing Music Metadata & Getting Cover Art
+    # picard # For Changing Music Metadata & Getting Cover Art
     pkg-config # Wrapper Script For Allowing Packages To Get Info On Others
     playerctl # Allows Changing Media Volume Through Scripts
-    rhythmbox
+    # rhythmbox
     ripgrep # Improved Grep
     socat # Needed For Screenshots
     sox # audio support for FFMPEG
@@ -68,6 +69,6 @@
     v4l-utils # Used For Things Like OBS Virtual Camera
     waypaper # backup wallpaper GUI
     wget # Tool For Fetching Files With Links
-    ytmdl # Tool For Downloading Audio From YouTube
+    # ytmdl # Tool For Downloading Audio From YouTube
   ];
 }

@@ -1,0 +1,48 @@
+\ProvidesPackage{mathjesticcore}
+
+% BASIC PACKAGES
+\RequirePackage{anyfontsize}
+\RequirePackage{mathtools}
+\RequirePackage{amssymb}
+\RequirePackage{amsthm}
+\RequirePackage{geometry}
+\RequirePackage{setspace}
+\RequirePackage{microtype}
+\RequirePackage[indent=2em]{parskip}
+\RequirePackage{xcolor}
+\RequirePackage{tikz}
+\usetikzlibrary{math, tikzmark}
+\RequirePackage{graphicx}
+\RequirePackage{subfiles}
+\RequirePackage{xfp}
+\RequirePackage[inline]{asymptote}
+\RequirePackage{multicol}
+\RequirePackage{lipsum}
+
+% FONTS
+\RequirePackage{fontspec}
+\newfontfamily\montserrat{Montserrat}
+
+% PAGE LAYOUT
+\geometry{legalpaper, left=21.6mm, right=21.6mm, top=26.6mm, bottom=26.6mm}
+\setlength{\marginparwidth}{21.6mm}
+\doublespacing
+
+% IMAGE PATHS
+\graphicspath{{/home/majestic/.asydir/}}
+
+% HYPERREF
+\RequirePackage[hidelinks]{hyperref}
+\hypersetup{pdflinkmargin=0pt}
+\let\oldhref\href
+\renewcommand{\href}[2]{\mbox{\oldhref{#1}{#2}}}
+
+% MUST LOAD AFTER HYPERREF
+\RequirePackage{ellipsis}
+\RequirePackage{cleveref}
+\RequirePackage{xurl}
+\hypersetup{breaklinks=true}
+\hypersetup{pageanchor=true} 
+\urlstyle{tt}
+\RequirePackage[tikz]{ocgx2}
+% \usetikzlibrary{ocgx}

@@ -1,0 +1,179 @@
+\ProvidesPackage{mathjesticcover}
+
+\RequirePackage{expl3}
+\RequirePackage{l3keys2e}
+\RequirePackage{tikz}
+
+% --- Cover fields (expl3) ------------------------------------------
+\ExplSyntaxOn
+\tl_new:N \g_mj_cover_title_tl
+\tl_new:N \g_mj_cover_author_tl
+\tl_new:N \g_mj_cover_text_tl
+
+% Keep your previous defaults (edit or clear if you prefer blank)
+% \tl_gset:Nn \g_mj_cover_title_tl  { Cover Title }
+% \tl_gset:Nn \g_mj_cover_author_tl { Nabil Nabawi Wibisono }
+
+% Public setters
+\NewDocumentCommand \mycovertitle  { m } { \tl_gset:Nn \g_mj_cover_title_tl  {#1} }
+\NewDocumentCommand \mycoverauthor { m } { \tl_gset:Nn \g_mj_cover_author_tl {#1} }
+
+% Public accessor for the composed TikZ content
+\NewDocumentCommand \mycovertext { } { \tl_use:N \g_mj_cover_text_tl }
+
+\NewDocumentCommand{\mycover}{}{}
+
+% --- Measuring/formatting helper for the title ---------------------
+\newdimen\mj@covertitle@wd
+\newsavebox{\mj@covertitlebox}
+\newcommand*\mjFormatCoverTitle{%
+  \sbox{\mj@covertitlebox}{%
+    \montserrat\fontsize{100}{80}\selectfont\bfseries
+    \tl_use:N \g_mj_cover_title_tl
+  }%
+  \mj@covertitle@wd=\wd\mj@covertitlebox
+  \tl_if_blank:VTF \g_mj_cover_title_tl
+    { }% blank → nothing
+    {% nonblank → letterspace if "short"
+      \ifdim \mj@covertitle@wd < .51\paperwidth
+        \textls[250]{\tl_use:N \g_mj_cover_title_tl}%
+      \else
+        \tl_use:N \g_mj_cover_title_tl
+      \fi
+    }%
+}
+
+% --- Style selection & content builder ------------------------------
+
+\str_new:N \g_mathjestic_cover_style_str
+
+\cs_new_protected:Npn \mathjestic_cover_apply:n #1
+  {
+    \str_case:nnF {#1}
+    {
+      {fieldtrack} {
+        \str_gset:Nn \g_mathjestic_cover_style_str {#1}
+        \tl_gset:Nn \g_mj_cover_text_tl
+          {
+            \begin{tikzpicture}[remember~picture, overlay]
+              \node [anchor = center, text=c6, font=\montserrat\fontsize{100}{80}\selectfont\bfseries,
+                     xshift=0, yshift=0, inner~sep=0, outer~sep=0]
+                   at (current~page.center)
+                   {\parbox{\textwidth}{\begin{center}\tl_use:N \g_mj_cover_title_tl \end{center}}};
+              \node [anchor = south, text=c6, font=\montserrat\normalsize,
+                     xshift=0, yshift=0.015625\paperwidth, inner~sep=0, outer~sep=0]
+                   at (current~page.south)
+                   {\tl_use:N \g_mj_cover_author_tl};
+            \end{tikzpicture}
+          }
+      }
+      {ovalx} {
+        \str_gset:Nn \g_mathjestic_cover_style_str {#1}
+        \tl_gset:Nn \g_mj_cover_text_tl
+          {
+            \begin{tikzpicture}[remember~picture, overlay]
+              \node [anchor = center, text=c6, font=\montserrat\fontsize{100}{80}\selectfont\bfseries,
+                     xshift=0, yshift=0, inner~sep=0, outer~sep=0]
+                   at (current~page.center)
+                   {\parbox{\textwidth}{\begin{center}\mjFormatCoverTitle\end{center}}};
+              \node [anchor = south, text=c6, font=\montserrat\normalsize,
+                     xshift=0, yshift=0.015625\paperwidth, inner~sep=0, outer~sep=0]
+                   at (current~page.south)
+                   {\tl_use:N \g_mj_cover_author_tl};
+            \end{tikzpicture}
+          }
+      }
+      {parallelo} {
+        \str_gset:Nn \g_mathjestic_cover_style_str {#1}
+        \tl_gset:Nn \g_mj_cover_text_tl
+          {
+            \begin{tikzpicture}[remember~picture, overlay]
+              \node [anchor = north~west, text=c6, font=\montserrat\fontsize{45}{54}\selectfont\bfseries,
+                     xshift=21.6mm, yshift=-26.6mm, inner~sep=0, outer~sep=0]
+                   at (current~page.north~west)
+                   {\parbox{\textwidth}{\begin{flushleft}\tl_use:N \g_mj_cover_title_tl \end{flushleft}}};
+              \node [anchor = south~east, text=c6, font=\montserrat\normalsize,
+                     xshift=-21.6mm, yshift=26.6mm, inner~sep=0, outer~sep=0]
+                   at (current~page.south~east)
+                   {\tl_use:N \g_mj_cover_author_tl};
+            \end{tikzpicture}
+          }
+      }
+      {bricks} {
+        \str_gset:Nn \g_mathjestic_cover_style_str {#1}
+        \tl_gset:Nn \g_mj_cover_text_tl
+          {
+            \begin{tikzpicture}[remember~picture, overlay]
+              \node [anchor = north, text=c6, font=\montserrat\fontsize{50}{50}\selectfont\bfseries,
+                     xshift=0, yshift=-26.6mm, inner~sep=0, outer~sep=0]
+                   at (current~page.north)
+                   {\parbox{\textwidth}{\begin{center}\tl_use:N \g_mj_cover_title_tl \end{center}}};
+              \node [anchor = south, text=c6, font=\montserrat\normalsize,
+                     xshift=0, yshift=26.6mm, inner~sep=0, outer~sep=0]
+                   at (current~page.south)
+                   {\tl_use:N \g_mj_cover_author_tl};
+            \end{tikzpicture}
+          }
+      }
+      {windows} {
+        \str_gset:Nn \g_mathjestic_cover_style_str {#1}
+        \tl_gset:Nn \g_mj_cover_text_tl
+          {
+            \begin{tikzpicture}[remember~picture, overlay]
+              \node [anchor = north, text=c6, font=\montserrat\fontsize{55}{60}\selectfont\bfseries,
+                     xshift=0, yshift=-26.6mm, inner~sep=0, outer~sep=0]
+                   at (current~page.north)
+                   {\parbox{\textwidth}{\begin{center}\tl_use:N \g_mj_cover_title_tl \end{center}}};
+              \node [anchor = south, text=c6, font=\montserrat\normalsize,
+                     xshift=0, yshift=26.6mm, inner~sep=0, outer~sep=0]
+                   at (current~page.south)
+                   {\tl_use:N \g_mj_cover_author_tl};
+            \end{tikzpicture}
+          }
+      }
+      {garganta} {
+        \str_gset:Nn \g_mathjestic_cover_style_str {#1}
+        \tl_gset:Nn \g_mj_cover_text_tl
+          {
+            \begin{tikzpicture}[remember~picture, overlay]
+              \node [anchor = north, text=c6, font=\montserrat\fontsize{55}{60}\selectfont\bfseries,
+                     xshift=0, yshift=-26.6mm, inner~sep=0, outer~sep=0]
+                   at (current~page.north)
+                   {\parbox{\textwidth}{\begin{center}\tl_use:N \g_mj_cover_title_tl \end{center}}};
+              \node [anchor = south, text=c6, font=\montserrat\normalsize,
+                     xshift=0, yshift=26.6mm, inner~sep=0, outer~sep=0]
+                   at (current~page.south)
+                   {\tl_use:N \g_mj_cover_author_tl};
+            \end{tikzpicture}
+          }
+      }
+    }
+    { % default
+      \str_gset:Nn \g_mathjestic_cover_style_str { garganta }
+    }
+    % keep your \mycover macro returning the style name
+    \RenewDocumentCommand \mycover { } { \str_use:N \g_mathjestic_cover_style_str }
+  }
+
+% Package key
+\keys_define:nn { mathjesticcover }
+  { cover .code:n = \mathjestic_cover_apply:n {#1}, }
+
+% Process options
+\ProcessKeysOptions{mathjesticcover}
+
+\cs_new_protected:Npn \mathjestic_makecover:
+  {
+    \thispagestyle{empty}
+    \begin{tikzpicture}[remember~picture, overlay]
+      \node
+        [anchor = south~west, inner~sep = 0, outer~sep = 0]
+        at (current~page.south~west)
+        { \includegraphics[scale = 1, trim = 0~0~0~0, clip]{bookcover-\mycover-\mycolortheme} };
+    \end{tikzpicture}
+    \mycovertext
+  }
+
+\NewDocumentCommand \makecover { } { \mathjestic_makecover: }
+
+\ExplSyntaxOff

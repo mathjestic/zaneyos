@@ -1,0 +1,50 @@
+\ProvidesPackage{mathjesticproblem}
+\RequirePackage{expl3}
+
+\ExplSyntaxOn
+% Ensure flags exist (default false if not set elsewhere)
+\bool_if_exist:NF \g_mj_article_bool { \bool_new:N \g_mj_article_bool }
+\bool_if_exist:NF \g_mj_video_bool   { \bool_new:N \g_mj_video_bool }
+
+% If both are on, video wins (info only)
+\bool_if:NT \g_mj_video_bool
+  { \bool_if:NT \g_mj_article_bool
+      { \PackageInfo{mathjesticproblem}{Both `video' and `article' options given; using `video'.} } }
+
+% Dispatch
+\bool_if:NTF \g_mj_video_bool
+  {
+    % --- VIDEO ---
+    \IfFileExists{mathjesticproblemvideo.sty}
+      { \RequirePackage{mathjesticproblemvideo} }
+      {
+        \PackageWarning{mathjesticproblem}
+          {Option `video' true but `mathjesticproblemvideo.sty' not found. Falling back.}
+        \bool_if:NTF \g_mj_article_bool
+          {
+            \IfFileExists{mathjesticproblemarticle.sty}
+              { \RequirePackage{mathjesticproblemarticle} }
+              {
+                \PackageWarning{mathjesticproblem}
+                  {Option `article' true but `mathjesticproblemarticle.sty' not found. Using book layer.}
+                \RequirePackage{mathjesticproblembook}
+              }
+          }
+          { \RequirePackage{mathjesticproblembook} }
+      }
+  }
+  {
+    % --- ARTICLE / BOOK ---
+    \bool_if:NTF \g_mj_article_bool
+      {
+        \IfFileExists{mathjesticproblemarticle.sty}
+          { \RequirePackage{mathjesticproblemarticle} }
+          {
+            \PackageWarning{mathjesticproblem}
+              {Option `article' true but `mathjesticproblemarticle.sty' not found. Using book layer.}
+            \RequirePackage{mathjesticproblembook}
+          }
+      }
+      { \RequirePackage{mathjesticproblembook} }
+  }
+\ExplSyntaxOff

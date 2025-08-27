@@ -1,0 +1,448 @@
+\ProvidesPackage{mathjesticcolor}
+
+\RequirePackage{xcolor}
+\RequirePackage{expl3}
+\RequirePackage{l3keys2e}
+\RequirePackage{xparse}
+
+\ExplSyntaxOn
+
+\str_new:N \g_icon_color_correction_one_str
+\str_new:N \g_icon_color_correction_two_str
+\str_new:N \g_icon_color_correction_three_str
+\str_new:N \g_icon_color_correction_four_str
+\str_new:N \g_icon_color_correction_five_str
+\str_gset:Nn \g_icon_color_correction_one_str {c1}
+\str_gset:Nn \g_icon_color_correction_two_str {c1}
+\str_gset:Nn \g_icon_color_correction_three_str {c1}
+\str_gset:Nn \g_icon_color_correction_four_str {c1}
+\str_gset:Nn \g_icon_color_correction_five_str {c1}
+
+\newcommand\hinttextcolorone{c1}
+\newcommand\hinttextcolortwo{c1}
+\newcommand\hinttextcolorthree{c6}
+\newcommand\hinttextcolorfour{c6}
+
+\str_new:N \g_cthree_color_correction_str
+
+\str_new:N \g_color_csix_on_cone_str
+\str_new:N \g_color_cone_on_csix_str
+
+\NewDocumentCommand{\mycolortheme}{}{}
+\NewDocumentCommand{\mycsixonone}{}{c6}
+\NewDocumentCommand{\myconeonsix}{}{c1}
+
+% Color palette setup
+\cs_new_protected:Npn \mathjestic_colorpalette_setup:nnnnnn #1#2#3#4#5#6
+  {
+    \definecolor{c1}{HTML}{#1}
+    \definecolor{c2}{HTML}{#2}
+    \definecolor{c3}{HTML}{#3}
+    \definecolor{c4}{HTML}{#4}
+    \definecolor{c5}{HTML}{#5}
+    \definecolor{c6}{HTML}{#6}
+  }
+
+\cs_new_protected:Npn \mathjestic_examplecolors_set:nnnnn #1#2#3#4#5
+  {
+    \colorlet{exbg}{#1}
+    \colorlet{exfr}{#2}
+    \colorlet{exfr2}{#3}
+    \colorlet{exfr3}{#4}
+    \colorlet{extxt}{#5}
+  }
+
+\cs_new_protected:Npn \mathjestic_theoremcolors_set:nn #1#2
+  {
+    \colorlet{thbg}{#1}  % theorem background
+    \colorlet{thtxt}{#2} % theorem text
+  }
+
+\cs_new_protected:Npn \mathjestic_claimcolors_set:nnn #1#2#3
+  {
+    \colorlet{clbg}{#1}  % claim background
+    \colorlet{cltxt}{#2} % claim text
+    \colorlet{clfr}{#3} % claim frame color
+  }
+
+\cs_new_protected:Npn \mathjestic_notescolors_set:nn #1#2
+  {
+    \colorlet{ntbg}{#1}  % notes background
+    \colorlet{nttxt}{#2} % notes text
+  }
+
+\cs_new_protected:Npn \mathjestic_pnumboxcolors_set:nnnnn #1#2#3#4#5
+  {
+    \colorlet{pnbg}{#1}  % claim background
+    \colorlet{pntxt}{#2} % claim text
+    \colorlet{pnfavtxt}{#3} % claim text
+    \colorlet{pnfr}{#4} % claim frame color
+    \colorlet{pnfr2}{#5} % claim frame color
+  }
+
+\cs_new_protected:Npn \mathjestic_hnumboxcolors_set:nnnn #1#2#3#4
+  {
+    \colorlet{hnbg}{#1}  % claim background
+    \colorlet{hntxt}{#2} % claim text
+    \colorlet{hnfr}{#3} % claim frame color
+    \colorlet{hnfr2}{#4} % claim frame color
+  }
+
+\cs_new_protected:Npn \mathjestic_snumboxcolors_set:nnnn #1#2#3#4
+  {
+    \colorlet{snbg}{#1}  % claim background
+    \colorlet{sntxt}{#2} % claim text
+    \colorlet{snfr}{#3} % claim frame color
+    \colorlet{snfr2}{#4} % claim frame color
+  }
+
+\cs_new_protected:Npn \mathjestic_importantnumboxcolors_set:n #1
+  {
+    \colorlet{importantbg}{#1}  % claim background
+  }
+
+% Handler for color-theme key
+\cs_new_protected:Npn \mathjestic_colorpalette_apply_theme:n #1
+  {
+    \str_case:nnF {#1}
+    {
+      {nifle}  {
+        \mathjestic_colorpalette_setup:nnnnnn {002D32}{189AB4}{42D1DD}{00CFC1}{A1F2FF}{D6F9FE}
+        \colorlet{bg}{c5!40}  \colorlet{bg2}{c6!50}
+        \mathjestic_examplecolors_set:nnnnn {c6!20} {c1!60!c2} {c2} {c2!20!c3} {c6!20}
+        % \mathjestic_examplecolors_set:nnnnn {c6!20} {c2} {c2!60!c3} {c2!40!c3} {c6!20}
+        \mathjestic_theoremcolors_set:nn {c6!40}{c6!40}
+        \mathjestic_claimcolors_set:nnn {c5!25}{c2}{c2}
+        \mathjestic_notescolors_set:nn {c6!50}{c2}
+        \mathjestic_pnumboxcolors_set:nnnnn {white}{c2}{c2!40!c1}{c4!10!c3}{c5!60!c6}
+        \mathjestic_hnumboxcolors_set:nnnn {white}{c2}{c4!10!c3}{c5!60!c6}
+        \mathjestic_snumboxcolors_set:nnnn {white}{c2}{c4!10!c3}{c5!60!c6}
+        \mathjestic_importantnumboxcolors_set:n {c5!50}
+        \str_gset:Nn \g_color_palette_str {nifle}
+      }
+
+      {azuria} {
+        \mathjestic_colorpalette_setup:nnnnnn {00234b}{00498d}{0076c6}{1bbbf5}{aaedfe}{dbfafa}
+        \colorlet{bg}{c5!60}  \colorlet{bg2}{c6!35}
+        \mathjestic_examplecolors_set:nnnnn {c6!40} {c2} {c3} {c3!40!c4} {c6!40}
+        % \mathjestic_examplecolors_set:nnnnn {c6!40} {c2} {c2!50!c3} {c2!10!c3} {c6!40}
+        \mathjestic_theoremcolors_set:nn {c6!60}{c6!40}
+        \mathjestic_claimcolors_set:nnn {c5!25}{c2}{c2}
+        \mathjestic_notescolors_set:nn {c6!50}{c2}
+        \mathjestic_pnumboxcolors_set:nnnnn {white}{c2}{c6!40}{c4!50!c3}{c5!70!c4}
+        \mathjestic_hnumboxcolors_set:nnnn {white}{c2}{c4!50!c3}{c5!70!c4}
+        \mathjestic_snumboxcolors_set:nnnn {white}{c2}{c4!50!c3}{c5!70!c4}
+        \mathjestic_importantnumboxcolors_set:n {c5!50}
+        \str_gset:Nn \g_color_palette_str {azuria}
+      }
+
+      {chili}  {
+        \mathjestic_colorpalette_setup:nnnnnn {250902}{860F19}{DE1B42}{D72C12}{FF7777}{FFE3E3}
+        \colorlet{bg}{c5!10}  \colorlet{bg2}{c6}
+        \mathjestic_examplecolors_set:nnnnn {c6!15} {c2} {c3} {c3!40!c4} {c6!20}
+        % \mathjestic_examplecolors_set:nnnnn {c6!30} {c2} {c2!50!c3} {c2!30!c3} {c6!30}
+        \mathjestic_theoremcolors_set:nn {c6!20}{c6!30}
+        \mathjestic_claimcolors_set:nnn {c5!10}{c2}{c2}
+        \mathjestic_notescolors_set:nn {c6!35}{c2}
+        \mathjestic_pnumboxcolors_set:nnnnn {white}{c2}{c6!20}{c4!60!c3}{c5!60!c6}
+        \mathjestic_hnumboxcolors_set:nnnn {white}{c2}{c4!60!c3}{c5!60!c6}
+        \mathjestic_snumboxcolors_set:nnnn {white}{c2}{c4!60!c3}{c5!60!c6}
+        \mathjestic_importantnumboxcolors_set:n {c5!30}
+        \str_gset:Nn \g_color_palette_str {chili}
+      }
+
+      {viola}  {
+        \mathjestic_colorpalette_setup:nnnnnn {3B003B}{890089}{B309EC}{F420FF}{F89CF8}{FFE7FF}
+        \colorlet{bg}{c5!40}  \colorlet{bg2}{c6!90}
+        \mathjestic_examplecolors_set:nnnnn {c6!30} {c2} {c3} {c3!40!c4} {c6!30}
+        % \mathjestic_examplecolors_set:nnnnn {c6!30} {c2} {c2!70!c3} {c2!50!c3} {c6!30}
+        \mathjestic_theoremcolors_set:nn {c6!40}{c6!40}
+        \mathjestic_claimcolors_set:nnn {c5!20}{c2}{c2}
+        \mathjestic_notescolors_set:nn {c6!50}{c2}
+        \mathjestic_pnumboxcolors_set:nnnnn {white}{c2}{c6!30}{c4!60!c3}{c5!70!c6}
+        \mathjestic_hnumboxcolors_set:nnnn {white}{c2}{c4!60!c3}{c5!70!c6}
+        \mathjestic_snumboxcolors_set:nnnn {white}{c2}{c4!60!c3}{c5!70!c6}
+        \mathjestic_importantnumboxcolors_set:n {c5!35}
+        \str_gset:Nn \g_color_palette_str {viola}
+      }
+
+      {botany} {
+        \mathjestic_colorpalette_setup:nnnnnn {01261A}{004B23}{009E00}{59F859}{B7F8B6}{E7FFE7}
+        \colorlet{bg}{c5!60}  \colorlet{bg2}{c6!90}
+        \mathjestic_examplecolors_set:nnnnn {c6!30} {c2} {c2!10!c3} {c3!60!c4} {c6!30}
+        % \mathjestic_examplecolors_set:nnnnn {c6!30} {c2} {c2!50!c3} {c2!20!c3} {c6!30}
+        \mathjestic_theoremcolors_set:nn {c6!40}{c6!40}
+        \mathjestic_claimcolors_set:nnn {c5!35}{c2}{c2}
+        \mathjestic_notescolors_set:nn {c6!50}{c2}
+        \mathjestic_pnumboxcolors_set:nnnnn {white}{c2}{c6!30}{c4!50!c3}{c5}
+        \mathjestic_hnumboxcolors_set:nnnn {white}{c2}{c4!50!c3}{c5}
+        \mathjestic_snumboxcolors_set:nnnn {white}{c2}{c4!50!c3}{c5}
+        \mathjestic_importantnumboxcolors_set:n {c5!50}
+        \str_gset:Nn \g_color_palette_str {botany}
+      }
+
+      {sunset} {
+        \mathjestic_colorpalette_setup:nnnnnn {321E00}{90672B}{FFAA2C}{FFD500}{FFF374}{FFF7D4}
+        \colorlet{bg}{c5!40}  \colorlet{bg2}{c6!80}
+        \mathjestic_examplecolors_set:nnnnn {c6!20} {c1!60!c2} {c2} {c2!50!c3} {c6!20}
+        % \mathjestic_examplecolors_set:nnnnn {c6!30} {c2} {c2!70!c3} {c2!50!c3} {c6!30}
+        \mathjestic_theoremcolors_set:nn {c6!40}{c6!40}
+        \mathjestic_claimcolors_set:nnn {c5!30}{c2}{c2}
+        \mathjestic_notescolors_set:nn {c6!50}{c2}
+        % \mathjestic_pnumboxcolors_set:nnnn {white}{c2}{c4!10!c3}{c5!10!c4}
+        \mathjestic_pnumboxcolors_set:nnnnn {white}{c2}{c2!65!c1}{c3!90!c4}{c5!90!c4}
+        % \mathjestic_hnumboxcolors_set:nnnn {white}{c2}{c4!10!c3}{c5!10!c4}
+        \mathjestic_hnumboxcolors_set:nnnn {white}{c2}{c3!90!c4}{c5!90!c4}
+        % \mathjestic_snumboxcolors_set:nnnn {white}{c2}{c4!10!c3}{c5!10!c4}
+        \mathjestic_snumboxcolors_set:nnnn {white}{c2}{c3!90!c4}{c5!90!c4}
+        \mathjestic_importantnumboxcolors_set:n {c5!60}
+        \str_gset:Nn \g_color_palette_str {sunset}
+      }
+
+      {indigo} {
+        \mathjestic_colorpalette_setup:nnnnnn {220049}{380295}{6C00FF}{9C8AFF}{DBCDFF}{E4E4FF}
+        \colorlet{bg}{c5!40}  \colorlet{bg2}{c6!80}
+        \mathjestic_examplecolors_set:nnnnn {c6!30} {c2} {c3} {c3!20!c4} {c6!30}
+        % \mathjestic_examplecolors_set:nnnnn {c6!30} {c2} {c2!60!c3} {c2!30!c3} {c6!30}
+        \mathjestic_theoremcolors_set:nn {c6!40}{c6!40}
+        \mathjestic_claimcolors_set:nnn {c5!35}{c2}{c2}
+        \mathjestic_notescolors_set:nn {c6!50}{c2}
+        \mathjestic_pnumboxcolors_set:nnnnn {white}{c2}{c6!30}{c4!30!c3}{c5!50!c4}
+        \mathjestic_hnumboxcolors_set:nnnn {white}{c2}{c4!30!c3}{c5!50!c4}
+        \mathjestic_snumboxcolors_set:nnnn {white}{c2}{c4!30!c3}{c5!50!c4}
+        \mathjestic_importantnumboxcolors_set:n {c5!50}
+        \str_gset:Nn \g_color_palette_str {indigo}
+      }
+
+      {verdura}{
+        \mathjestic_colorpalette_setup:nnnnnn {073b3a}{0b6e4f}{08a045}{6bbf59}{addf91}{efffc8}
+        \colorlet{bg}{c5!20}  \colorlet{bg2}{c6!40}
+        \mathjestic_examplecolors_set:nnnnn {c6!45} {c2} {c3} {c4} {c1}
+        \mathjestic_theoremcolors_set:nn {c6!40}{c6!40}
+        \mathjestic_claimcolors_set:nnn {c5!25}{c2}{c2}
+        \mathjestic_notescolors_set:nn {c6!50}{c2}
+        \mathjestic_pnumboxcolors_set:nnnnn {white}{c2}{c6!30}{c4!30!c3}{c5!50!c4}
+        \mathjestic_hnumboxcolors_set:nnnn {white}{c2}{c4!30!c3}{c5!50!c4}
+        \mathjestic_snumboxcolors_set:nnnn {white}{c2}{c4!30!c3}{c5!50!c4}
+        \mathjestic_importantnumboxcolors_set:n {c5}
+        \str_gset:Nn \g_color_palette_str {verdura}
+      }
+
+      {neutral}{
+        \mathjestic_colorpalette_setup:nnnnnn {081c15}{2d6a4f}{52b788}{95d5b2}{b7e4c7}{d8f3dc}
+        \colorlet{bg}{c5!50}  \colorlet{bg2}{c6!50}
+        \mathjestic_examplecolors_set:nnnnn {c6!50} {c2} {c3} {c4} {c1}
+        \mathjestic_theoremcolors_set:nn {c6!40}{c6!40}
+        \mathjestic_claimcolors_set:nnn {c5!25}{c2}{c2}
+        \mathjestic_notescolors_set:nn {c6!50}{c2}
+        \mathjestic_pnumboxcolors_set:nnnnn {white}{c2}{c1}{c4!30!c3}{c5!50!c4}
+        \mathjestic_hnumboxcolors_set:nnnn {white}{c2}{c4!30!c3}{c5!50!c4}
+        \mathjestic_snumboxcolors_set:nnnn {white}{c2}{c4!30!c3}{c5!50!c4}
+        \mathjestic_importantnumboxcolors_set:n {c5}
+        \str_gset:Nn \g_color_palette_str {neutral}
+      }
+
+      {firewatch}{
+        \mathjestic_colorpalette_setup:nnnnnn {2c112b}{520833}{8d193a}{c72a40}{ff6c40}{fde577}
+        \colorlet{bg}{c5!20}  \colorlet{bg2}{c6!30}
+        \mathjestic_examplecolors_set:nnnnn {c6!45} {c3} {c2} {c4} {c1}
+        \mathjestic_theoremcolors_set:nn {c6!40}{c6!40}
+        \mathjestic_claimcolors_set:nnn {c5!25}{c2}{c2}
+        \mathjestic_notescolors_set:nn {c6!50}{c2}
+        \mathjestic_pnumboxcolors_set:nnnnn {white}{c2}{c1}{c4!30!c3}{c5!50!c4}
+        \mathjestic_hnumboxcolors_set:nnnn {white}{c2}{c4!30!c3}{c5!50!c4}
+        \mathjestic_snumboxcolors_set:nnnn {white}{c2}{c4!30!c3}{c5!50!c4}
+        \mathjestic_importantnumboxcolors_set:n {c5}
+        \str_gset:Nn \g_color_palette_str {firewatch}
+      }
+
+      {lavanda}{
+        \mathjestic_colorpalette_setup:nnnnnn {3c096c}{5a189a}{7b2cbf}{9d4edd}{c77dff}{e0aaff}
+        \colorlet{bg}{c5!20}  \colorlet{bg2}{c6!20}
+        \mathjestic_examplecolors_set:nnnnn {c6!55} {c2} {c3} {c4} {c1}
+        \mathjestic_theoremcolors_set:nn {c6!40}{c6!40}
+        \mathjestic_claimcolors_set:nnn {c5!25}{c2}{c2}
+        \mathjestic_notescolors_set:nn {c6!50}{c2}
+        \mathjestic_pnumboxcolors_set:nnnnn {white}{c2}{c1}{c4!30!c3}{c5!50!c4}
+        \mathjestic_hnumboxcolors_set:nnnn {white}{c2}{c4!30!c3}{c5!50!c4}
+        \mathjestic_snumboxcolors_set:nnnn {white}{c2}{c4!30!c3}{c5!50!c4}
+        \mathjestic_importantnumboxcolors_set:n {c5}
+        \str_gset:Nn \g_color_palette_str {lavanda}
+      }
+
+      {desertic}{
+        \mathjestic_colorpalette_setup:nnnnnn {710000}{a63c06}{c36f09}{d9950a}{eeba0b}{f4e409}
+        \colorlet{bg}{c5!20}  \colorlet{bg2}{c6!20}
+        \mathjestic_examplecolors_set:nnnnn {c6!50} {c2} {c3} {c4} {c1}
+        \mathjestic_theoremcolors_set:nn {c6!40}{c6!40}
+        \mathjestic_claimcolors_set:nnn {c5!25}{c2}{c2}
+        \mathjestic_notescolors_set:nn {c6!50}{c2}
+        \mathjestic_pnumboxcolors_set:nnnnn {white}{c2}{c1}{c4!30!c3}{c5!50!c4}
+        \mathjestic_hnumboxcolors_set:nnnn {white}{c2}{c4!30!c3}{c5!50!c4}
+        \mathjestic_snumboxcolors_set:nnnn {white}{c2}{c4!30!c3}{c5!50!c4}
+        \mathjestic_importantnumboxcolors_set:n {c5}
+        \str_gset:Nn \g_color_palette_str {desertic}
+      }
+    }    
+    {
+    % Fallback: nifle-like defaults
+      \mathjestic_colorpalette_setup:nnnnnn {002D32}{189AB4}{42D1DD}{00CFC1}{A1F2FF}{D6F9FE}
+      \colorlet{bg}{c6} % simple fallback
+      \mathjestic_rolecolors_set:nnnnn {c6!40} {c2} {c3} {c4} {c1}
+      \str_gset:Nn \g_color_palette_str {nifle}
+      \PackageWarning{mathjesticcolorpalette}{Unknown color theme '#1'. Using 'nifle' as default.}
+    }
+    \str_case:VnTF \g_color_palette_str
+    {
+      { nifle } { \str_gset:Nn \g_icon_color_correction_five_str {c1} }
+      { azuria } { \str_gset:Nn \g_icon_color_correction_five_str {c1} }
+      { chili } { \str_gset:Nn \g_icon_color_correction_five_str {c1} }
+      { viola } { \str_gset:Nn \g_icon_color_correction_five_str {c1} }
+      { botany } { \str_gset:Nn \g_icon_color_correction_five_str {c1} }
+      { sunset } { \str_gset:Nn \g_icon_color_correction_five_str {c1} }
+      { indigo } { \str_gset:Nn \g_icon_color_correction_five_str {c1} }
+      { verdura } { \str_gset:Nn \g_icon_color_correction_five_str {c1} }
+      { neutral } { \str_gset:Nn \g_icon_color_correction_five_str {c1} }
+      { firewatch } { \str_gset:Nn \g_icon_color_correction_five_str {c6} }
+      { lavanda } { \str_gset:Nn \g_icon_color_correction_five_str {c6} }
+      { desertic } { \str_gset:Nn \g_icon_color_correction_five_str {c6} }
+    } {  } {  }
+    \str_case:Vn \g_color_palette_str
+    {
+      { nifle } {
+        \renewcommand\hinttextcolorone{c1}
+        \renewcommand\hinttextcolortwo{c1}
+        \renewcommand\hinttextcolorthree{c6}
+        \renewcommand\hinttextcolorfour{c6}
+      }
+      { azuria } {
+        \renewcommand\hinttextcolorone{c1}
+        \renewcommand\hinttextcolortwo{c1}
+        \renewcommand\hinttextcolorthree{c6}
+        \renewcommand\hinttextcolorfour{c6}
+      }
+      { chili } {
+        \renewcommand\hinttextcolorone{c1}
+        \renewcommand\hinttextcolortwo{c6}
+        \renewcommand\hinttextcolorthree{c6}
+        \renewcommand\hinttextcolorfour{c6}
+      }
+      { viola } {
+        \renewcommand\hinttextcolorone{c1}
+        \renewcommand\hinttextcolortwo{c1}
+        \renewcommand\hinttextcolorthree{c6}
+        \renewcommand\hinttextcolorfour{c6}
+      }
+      { botany } {
+        \renewcommand\hinttextcolorone{c1}
+        \renewcommand\hinttextcolortwo{c1}
+        \renewcommand\hinttextcolorthree{c6}
+        \renewcommand\hinttextcolorfour{c6}
+      }
+      { sunset } {
+        \renewcommand\hinttextcolorone{c1}
+        \renewcommand\hinttextcolortwo{c1}
+        \renewcommand\hinttextcolorthree{c6}
+        \renewcommand\hinttextcolorfour{c6}
+      }
+      { indigo } {
+        \renewcommand\hinttextcolorone{c1}
+        \renewcommand\hinttextcolortwo{c1}
+        \renewcommand\hinttextcolorthree{c6}
+        \renewcommand\hinttextcolorfour{c6}
+      }
+      { verdura } {
+        \renewcommand\hinttextcolorone{c1}
+        \renewcommand\hinttextcolortwo{c1}
+        \renewcommand\hinttextcolorthree{c6}
+        \renewcommand\hinttextcolorfour{c6}
+      }
+      { neutral } {
+        \renewcommand\hinttextcolorone{c1}
+        \renewcommand\hinttextcolortwo{c1}
+        \renewcommand\hinttextcolorthree{c6}
+        \renewcommand\hinttextcolorfour{c6}
+      }
+      { firewatch } {
+        \renewcommand\hinttextcolorone{c1}
+        \renewcommand\hinttextcolortwo{c1}
+        \renewcommand\hinttextcolorthree{c6}
+        \renewcommand\hinttextcolorfour{c6}
+      }
+      { lavanda } {
+        \renewcommand\hinttextcolorone{c1}
+        \renewcommand\hinttextcolortwo{c1}
+        \renewcommand\hinttextcolorthree{c6}
+        \renewcommand\hinttextcolorfour{c6}
+      }
+      { desertic } {
+        \renewcommand\hinttextcolorone{c1}
+        \renewcommand\hinttextcolortwo{c1}
+        \renewcommand\hinttextcolorthree{c6}
+        \renewcommand\hinttextcolorfour{c6}
+      }
+    }
+    \str_case:VnTF \g_color_palette_str
+    {
+      { nifle } { \str_gset:Nn \g_cthree_color_correction_str {c3!70!black} }
+      { sunset } { \str_gset:Nn \g_cthree_color_correction_str {c3!80!black} }
+    } {  } { \str_gset:Nn \g_cthree_color_correction_str {c3} }
+    \str_gset:Nn \g_color_csix_on_cone_str {c6}
+    \str_gset:Nn \g_color_cone_on_csix_str {c1}
+    \RenewDocumentCommand{\mycolortheme}{}{\str_use:N \g_color_palette_str}
+    % \RenewDocumentCommand{\mycsixonone}{}{\str_use:N \g_color_csix_on_cone_str}
+    % \RenewDocumentCommand{\myconeonsix}{}{\str_use:N \g_color_cone_on_csix_str}
+    \RenewDocumentCommand{\mycsixonone}{}{c6}
+    \RenewDocumentCommand{\myconeonsix}{}{c1}
+  }
+
+% Key definition for color-theme
+\keys_define:nn { mathjesticcolor }
+  {
+    color .code:n = \mathjestic_colorpalette_apply_theme:n {#1},
+    color .initial:n = azuria,
+
+    color-theme .meta:n = { color = #1 },
+    color theme .meta:n = { color = #1 },
+    colortheme  .meta:n = { color = #1 },
+  }
+
+% Set color theme on the fly
+\NewDocumentCommand \setcolortheme { m }
+  {
+    \mathjestic_colorpalette_apply_theme:n {#1}
+  }
+
+% #1 = value to search, #2 = sequence, #3 = macro to set with result (index, or 0 if not found)
+\cs_new:Npn \problemset_seq_index_of:nNN #1#2#3
+  {
+    \int_zero_new:N \l__problemset_tmpa_int
+    \int_set:Nn \l__problemset_tmpa_int { 1 }
+    \seq_map_inline:Nn #2
+      {
+        \str_if_eq:eeTF {##1} {#1}
+          {
+            \tl_set:Ne #3 { \int_use:N \l__problemset_tmpa_int }
+            \seq_map_break: % stop searching
+          }
+          {
+            \int_incr:N \l__problemset_tmpa_int
+          }
+      }
+  }
+
+\seq_gset_from_clist:Nn \g_problemset_theme_seq { indigo, azuria, nifle, botany, sunset, chili, viola }
+
+\cs_new_protected:Npn \problemset_rotate_theme:
+  {
+    \int_gincr:N \g_problemset_theme_index_int
+    \int_compare:nNnT { \g_problemset_theme_index_int } > { \seq_count:N \g_problemset_theme_seq }
+      { \int_gset:Nn \g_problemset_theme_index_int { 1 } }
+    \tl_set:Nx \l_tmpa_tl { \seq_item:Nn \g_problemset_theme_seq { \g_problemset_theme_index_int } }
+    \exp_args:NV \setcolortheme \l_tmpa_tl
+  }
+
+% Process options
+\ProcessKeysOptions{mathjesticcolor}
+
+\ExplSyntaxOff

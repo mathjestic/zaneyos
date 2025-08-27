@@ -1,0 +1,23 @@
+\ProvidesFile{mathjestic-source.tex}
+\ExplSyntaxOn
+
+% --- global switch: FORCE default OFF ---
+\bool_new:N \g_mj_sourceicon_bool
+\bool_gset_false:N \g_mj_sourceicon_bool
+
+% option: presence => ON
+\keys_define:nn { mathjestic }
+  {
+    sourceicon .code:n    = { \bool_gset_true:N \g_mj_sourceicon_bool },
+    % no .initial here; default stays OFF unless option is present
+  }
+
+% convenience conditionals
+\prg_new_conditional:Npnn \mj_if_sourceicon: { p, T, F, TF }
+  { \bool_if:NTF \g_mj_sourceicon_bool { \prg_return_true: } { \prg_return_false: } }
+
+% (optional) keep your camel-case helpers
+\NewDocumentCommand \IfSourceIconTF { m m } { \mj_if_sourceicon:TF {#1}{#2} }
+\NewDocumentCommand \IfSourceIconT  { m }   { \mj_if_sourceicon:T  {#1} }
+
+\ExplSyntaxOff

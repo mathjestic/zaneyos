@@ -1,0 +1,43 @@
+\ProvidesPackage{mathjesticmacro}[2025/08/16 Mathjestic: user macros]
+% Assumes mathtools and xcolor are already loaded by core.
+% If you want this file to be standalone, uncomment:
+% \RequirePackage{mathtools}
+% \RequirePackage{xcolor}
+
+% --- Paired delimiters ---
+\DeclarePairedDelimiter\paren{(}{)}
+\DeclarePairedDelimiter\set{\{}{\}}
+\DeclarePairedDelimiter\bkt{[}{]}
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}
+
+% --- Starred versions auto-size, unstar uses optional size like mathtools default ---
+\makeatletter
+\let\oldparen\paren
+\def\paren{\@ifstar{\oldparen}{\oldparen*}}
+\let\oldset\set
+\def\set{\@ifstar{\oldset}{\oldset*}}
+\let\oldbkt\bkt
+\def\bkt{\@ifstar{\oldbkt}{\oldbkt*}}
+\let\oldabs\abs
+\def\abs{\@ifstar{\oldabs}{\oldabs*}}
+\let\oldfloor\floor
+\def\floor{\@ifstar{\oldfloor}{\oldfloor*}}
+\let\oldceil\ceil
+\def\ceil{\@ifstar{\oldceil}{\oldceil*}}
+\let\oldnorm\norm
+\def\norm{\@ifstar{\oldnorm}{\oldnorm*}}
+\makeatother
+
+% --- Slot-filling helpers & color bars ---
+\newcommand{\hitam}{\textcolor{black}{\rule{0.4cm}{0.4mm}}}
+\newcommand{\biru}{\textcolor{blue}{\rule{0.4cm}{0.4mm}}}
+\newcommand{\merah}{\textcolor{red}{\rule{0.4cm}{0.4mm}}}
+
+\makeatletter
+\newcommand{\fillslot}[1]{#1\checknextarg}
+\newcommand{\checknextarg}{\@ifnextchar\bgroup{\gobblenextarg}{}}
+\newcommand{\gobblenextarg}[1]{\;\;#1\@ifnextchar\bgroup{\gobblenextarg}{}}
+\makeatother
