@@ -8,6 +8,7 @@
     blueman.enable = true; # Bluetooth Support
     tumbler.enable = true; # Image/video preview
     gnome.gnome-keyring.enable = true;
+    udisks2.enable = true;
 
     smartd = {
       enable =

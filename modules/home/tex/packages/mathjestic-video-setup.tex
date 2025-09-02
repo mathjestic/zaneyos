@@ -1,0 +1,66 @@
+% Packages needed for the video mode
+\RequirePackage{lmodern}
+\RequirePackage{cancel}
+\RequirePackage{enumitem}
+\RequirePackage{array}
+\RequirePackage{tabularx}
+\RequirePackage{makecell}
+\RequirePackage{wasysym}
+
+% Now define helpers and lists (2e zone)
+
+% --- cancel helpers ---
+\ProvideDocumentCommand{\rcancel}{ O{3mu} m m }{%
+  \renewcommand\CancelColor{\color{red}}%
+  \cancel{#2}^{\color{red}{\mkern#1 #3}}%
+}
+\ProvideDocumentCommand{\lrcancel}{ O{3mu} m m }{%
+  % using 'green' so this works even if dvipsnames wasn't applied
+  \renewcommand\CancelColor{\color{green}}%
+  \bcancel{#2}^{\color{green}{\mkern#1 #3}}%
+}
+
+% --- choices (single-answer) ---
+% avoid redefining if user already has it
+
+\newlist{choices}{enumerate}{1}
+\setlist[choices,1]{label=\textbf{(\Alph*)}, leftmargin=*, labelsep=1em, itemsep=4pt}
+
+% --- table tuning ---
+\renewcommand\arraystretch{1.35}
+\setlength{\tabcolsep}{6pt}
+
+% new columntype Y (guard in case Y exists)
+\makeatletter
+\@ifundefined{NC@find@Y}{%
+  \newcolumntype{Y}{>{\raggedright\arraybackslash}X}%
+}{}
+\makeatother
+
+% --- radio-style bullets for options ---
+\ProvideDocumentCommand{\opt}{}{ \Large\Circle }
+\ProvideDocumentCommand{\optfilled}{}{ \Large\CIRCLE } % reveal key if desired
+
+% --- standard DS text block ---
+\ProvideDocumentCommand{\DSstandardChoices}{}{%
+  \item Pernyataan (1) SAJA cukup untuk menjawab pertanyaan, tetapi Pernyataan (2) SAJA tidak cukup.%
+  \item Pernyataan (2) SAJA cukup untuk menjawab pertanyaan, tetapi Pernyataan (1) SAJA tidak cukup.%
+  \item DUA pernyataan BERSAMA-SAMA cukup untuk menjawab pertanyaan, tetapi SATU pernyataan SAJA tidak cukup.%
+  \item Pernyataan (1) SAJA cukup untuk menjawab pertanyaan dan Pernyataan (2) SAJA cukup.%
+  \item Pernyataan (1) dan Pernyataan (2) tidak cukup untuk menjawab pertanyaan.%
+}
+
+% --- checkboxes (multiple-answer) ---
+
+\newlist{checkboxes}{itemize}{1}
+
+\ProvideDocumentCommand{\checkboxlabel}{}{ \raisebox{0.2ex}{\Large\Square} }
+\setlist[checkboxes]{label=\checkboxlabel, leftmargin=*, labelsep=.8em, itemsep=6pt, topsep=2pt}
+
+% Fallback \CheckedBox if not provided elsewhere
+\providecommand{\CheckedBox}{\rlap{\checkmark}\raisebox{0.2ex}{\Large\Square}}
+\ProvideDocumentCommand{\CorrectChoice}{}{ \item[\CheckedBox] }
+
+\geometry{paperwidth=216mm, paperheight=270mm, left=21.6mm, right=21.6mm, top=26.6mm, bottom=26.6mm}
+\setlength{\marginparwidth}{21.6mm}
+\doublespacing

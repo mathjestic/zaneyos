@@ -381,6 +381,9 @@
   home.file.".config/texmf/tex/latex/mathjestic-video.tex" = {
     source = ./tex/packages/mathjestic-video.tex;
   };
+  home.file.".config/texmf/tex/latex/mathjestic-video-setup.tex" = {
+    source = ./tex/packages/mathjestic-video-setup.tex;
+  };
 
   home.file.".config/texmf/tex/latex/mathjestic.sty" = {
     source = ./tex/packages/mathjestic.sty;

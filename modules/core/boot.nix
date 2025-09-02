@@ -18,5 +18,6 @@
       magicOrExtension = ''\x7fELF....AI\x02'';
     };
     plymouth.enable = true;
+    supportedFilesystems = [ "exfat" ];
   };
 }

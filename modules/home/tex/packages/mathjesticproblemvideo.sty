@@ -1546,6 +1546,7 @@
 % =========================================================
 
 \NewDocumentEnvironment { problem } { O{} D(){} D""{} D<>{} } {
+  \newpage
   \refstepcounter{problemnumber}
   \int_gincr:N \g_problem_ID_int
   \int_gset:NV \g_problem_number_int \theproblemnumber

@@ -1,10 +1,12 @@
 \ProvidesPackage{mathjestic}
 
-\RequirePackage{mathjesticcore} 
 \RequirePackage{expl3}
 \RequirePackage{l3keys2e}
+\RequirePackage{mathjesticcore} 
 
 \InputIfFileExists{mathjestic-color.tex}{}{}
+\InputIfFileExists{mathjestic-video.tex}{}{}
+\InputIfFileExists{mathjestic-watermark.tex}{}{}
 \InputIfFileExists{mathjestic-cover.tex}{}{}
 \InputIfFileExists{mathjestic-toc.tex}{}{}
 \InputIfFileExists{mathjestic-hint.tex}{}{}
@@ -18,8 +20,6 @@
 \InputIfFileExists{mathjestic-hooks.tex}{}{}
 \InputIfFileExists{mathjestic-source.tex}{}{}
 \InputIfFileExists{mathjestic-difficulty.tex}{}{}
-\InputIfFileExists{mathjestic-watermark.tex}{}{}
-\InputIfFileExists{mathjestic-video.tex}{}{}
 
 \ProcessKeysOptions{mathjestic}
 

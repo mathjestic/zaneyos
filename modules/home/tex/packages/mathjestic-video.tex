@@ -8,7 +8,12 @@
 % Option: presence => ON (no key=value allowed)
 \keys_define:nn { mathjestic }
   {
-    video .code:n            = { \bool_gset_true:N \g_mj_video_bool },
+	video .code:n =
+	  {
+	    \bool_gset_true:N \g_mj_video_bool
+	    \PassOptionsToPackage{table,dvipsnames}{xcolor}
+	    \InputIfFileExists{mathjestic-video-setup.tex}{}{}
+	  },
   }
 
 % User-friendly wrappers (non-LaTeX3 style names)

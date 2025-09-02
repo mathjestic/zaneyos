@@ -8,6 +8,8 @@
 \RequirePackage{fontawesome5}
 \RequirePackage{relsize}
 
+\ExplSyntaxOn
+
 % -- Page Decoration Colors --
 \newlength{\foottikzheight}
 \setlength{\foottikzheight}{0.5cm}
@@ -32,15 +34,39 @@
   \href{https://www.youtube.com/@mathjestic}{\relsize{-1}\faYoutube}%
 }
 
+\tl_new:N \g_mj_materiapa_tl
+\tl_new:N \g_mj_kontaksiapa_tl
+\tl_new:N \g_mj_levelberapa_tl
+\tl_new:N \g_mj_levelband_tl
+
+% \tl_gset:Nn \g_mj_kontaksiapa_tl {}
+\tl_gset:Nn \g_mj_levelberapa_tl {1}
+
+\NewDocumentCommand \materiapa { m } { \tl_gset:Nn \g_mj_materiapa_tl {#1} }
+\NewDocumentCommand \kontaksiapa { m } { \tl_gset:Nn \g_mj_kontaksiapa_tl {#1} }
+\NewDocumentCommand \levelberapa { m } { \tl_gset:Nn \g_mj_levelberapa_tl {#1} }
+
 \NewDocumentCommand { \personalinstagram } {  } {
-  \href{https://www.instagram.com/nabilnnw/}{Nabil~Nabawi~Wibisono,~S.Si.}%
+  \IfVideoTF {
+    \tl_use:N \g_mj_kontaksiapa_tl
+  } {
+    \href{https://www.instagram.com/nabilnnw/}{Nabil~Nabawi~Wibisono,~S.Si.}%
+  }
 }
 
-\NewDocumentCommand { \videocontact } {  } {
-  Les Privat Matematika: 082337293909%
-}
-
-\ExplSyntaxOn
+\cs_new_protected:Npn \mj_update_levelband:
+  {
+    % Read the current level as an integer once
+    \int_set:Nn \l_tmpa_int { \tl_use:N \g_mj_levelberapa_tl }
+    % Map to band
+    \int_compare:nTF { \l_tmpa_int <= 2 }
+      { \tl_gset:Nn \g_mj_levelband_tl { Knowing } }
+      {
+        \int_compare:nTF { \l_tmpa_int <= 4 }
+          { \tl_gset:Nn \g_mj_levelband_tl { Applying } }
+          { \tl_gset:Nn \g_mj_levelband_tl { Reasoning } }
+      }
+  }
 
 % -- TikZ Header --
 \newcommand*\tikzhead{%
@@ -56,7 +82,9 @@
     \node [anchor = north~west, inner~sep=0, outer~sep=0] at (current~page.north~west) {\includegraphics[scale=1, trim=0~0~0~0, clip]{header-\mycolortheme}};
 
     \IfVideoTF {
-      \node [text=\g_color_csix_on_cone_str, font=\footnotesize\sffamily, xshift=-0.015625\paperwidth + 1.55mm, yshift=-0.5\foottikzheight, anchor=east, inner~sep=0, outer~sep=0] at (current~page.north~east) {\videocontact};
+      \node [text=\g_color_csix_on_cone_str, font=\footnotesize\sffamily, xshift=-0.015625\paperwidth + 1.55mm, yshift=-0.5\foottikzheight, anchor=east, inner~sep=0, outer~sep=0] at (current~page.north~east) {\tl_use:N \g_mj_materiapa_tl};
+      \mj_update_levelband:
+      \node [text=\g_color_csix_on_cone_str, font=\footnotesize\sffamily, xshift=-0.5\paperwidth + \xshiftfirst - 1.55mm, yshift=-0.5\foottikzheight, anchor=west, inner~sep=0, outer~sep=0] at (current~page.north~east) {Level~\tl_use:N \g_mj_levelberapa_tl \hspace{1mm}[\hspace{1mm} \tl_use:N \g_mj_levelband_tl \hspace{1mm}]};
     } {
       \node [text=\g_color_csix_on_cone_str, font=\footnotesize\sffamily, xshift=-0.015625\paperwidth + 1.55mm, yshift=-0.5\foottikzheight, anchor=east, inner~sep=0, outer~sep=0] at (current~page.north~east) {\rightmark};
     }
@@ -78,16 +106,19 @@
   \exp_args:NV \setcolortheme \g_color_palette_str
   \begin{tikzpicture}[remember~picture, overlay]
     \node [anchor = south~west, inner~sep=0, outer~sep=0] at (current~page.south~west) {\includegraphics[scale=1, trim=0~0~0~0, clip]{footer-\mycolortheme}};
-    \IfVideoTF { } {
-    	\node [text=\g_color_cone_on_csix_str, font=\footnotesize\sffamily, xshift=-0.015625\paperwidth, yshift=0.5\foottikzheight, inner~sep=0, outer~sep=0] at (current~page.south~east) {\thepage};
-    }
+    \node [text=\g_color_cone_on_csix_str, font=\footnotesize\sffamily, xshift=-0.015625\paperwidth, yshift=0.5\foottikzheight, inner~sep=0, outer~sep=0] at (current~page.south~east) {\thepage};
     \node [text=\g_color_csix_on_cone_str, font=\footnotesize\sffamily, xshift=0.015625\paperwidth-1.55mm, yshift=0.5\foottikzheight, anchor=west, inner~sep=0, outer~sep=0] at (current~page.south~west) {\personalinstagram};
   \end{tikzpicture}
 }
 \ExplSyntaxOff
 
 % -- Set fancyhdr with these decorations --
-\setlength{\headheight}{15pt} % Avoid header warning
+\IfVideoTF{
+  \setlength{\headheight}{20pt} % Avoid header warning
+  \setlength{\footskip}{20pt} % Avoid footer warning
+} {
+  \setlength{\headheight}{15pt} % Avoid header warning
+}
 \fancyhf{} % Clear all header/footer fields
 \renewcommand{\headrulewidth}{0pt} % Remove header line
 \fancyhead{\tikzhead}
@@ -101,9 +132,11 @@
 % -- Title page decoration --
 \newcommand*\titlepagedecoration{%
   \begin{tikzpicture}[remember picture, overlay]
-    \node [anchor = north west, inner sep=0, outer sep=0] at (current page.north west) {%
-      \includegraphics[scale=1, trim=0 0 0 0, clip]{titlepage-\mycolortheme}%
-    };
+    \IfVideoTF {
+      \node [anchor = north west, inner sep=0, outer sep=0] at (current page.north west) {\includegraphics[scale=1, trim=0 0 0 0, clip]{titlepage-video-\mycolortheme}};
+    } {
+      \node [anchor = north west, inner sep=0, outer sep=0] at (current page.north west) {\includegraphics[scale=1, trim=0 0 0 0, clip]{titlepage-\mycolortheme}};
+    }
   \end{tikzpicture}
 }
 
@@ -143,6 +176,8 @@
 \tl_new:N \g_mj_subtitle_tl
 \tl_new:N \g_mj_author_tl
 \tl_new:N \g_mj_date_tl
+\tl_new:N \g_mj_webname_tl
+\tl_gset:Nn \g_mj_webname_tl {@mathjestic.id}
 
 % Setters (global) — leave unset to suppress printing
 \NewDocumentCommand \mytitle    { m } { \tl_gset:Nn \g_mj_title_tl    {#1} }
@@ -154,7 +189,8 @@
   \thispagestyle{empty}%
   \titlepagedecoration
   \putlogomid
-  \par\vspace*{0em}%
+  \NoWatermarkThisPage
+  \par\IfVideoTF{\vspace*{-2em}}{\vspace*{0em}}%
   \begin{center}%
     % Title (print only if nonblank)
     \tl_if_blank:VTF \g_mj_title_tl
@@ -171,12 +207,20 @@
     % Author (print only if nonblank)
     \tl_if_blank:VTF \g_mj_author_tl
       { } % blank → nothing
-      { {\color{\g_cthree_color_correction_str}\Large\scshape \tl_use:N \g_mj_author_tl \par} }
+      { \IfVideoTF {
+          \color{\g_cthree_color_correction_str}\Large\sffamily \tl_use:N \g_mj_webname_tl \rmfamily
+        } {
+          \color{\g_cthree_color_correction_str}\Large\scshape \tl_use:N \g_mj_author_tl
+        } \par
+      }
 
     % Date (print only if nonblank)
     \tl_if_blank:VTF \g_mj_date_tl
       { } % blank → nothing
-      { \vskip 0em {\normalsize\scshape\color{\g_cthree_color_correction_str} Updated:~ \tl_use:N \g_mj_date_tl \par} }
+      { \vskip 0em \IfVideoTF {
+          \normalsize\scshape\color{\g_cthree_color_correction_str} Posted~On:~ \tl_use:N \g_mj_date_tl
+        } {\normalsize\scshape\color{\g_cthree_color_correction_str} Updated~ On:~ \tl_use:N \g_mj_date_tl } \par
+      }
   \end{center}%
   \par\vspace{1.5em}%
   \newpage
