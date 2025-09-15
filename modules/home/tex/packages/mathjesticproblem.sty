@@ -16,7 +16,7 @@
   {
     % --- VIDEO ---
     \IfFileExists{mathjesticproblemvideo.sty}
-      { \RequirePackage{mathjesticproblemvideo} }
+      { \RequirePackage{mathjesticproblemvideo} \bool_gset_true:N \g_mj_article_bool}
       {
         \PackageWarning{mathjesticproblem}
           {Option `video' true but `mathjesticproblemvideo.sty' not found. Falling back.}

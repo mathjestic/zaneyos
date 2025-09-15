@@ -1602,79 +1602,34 @@
 
   \prop_get:NVN \g_problem_source_prop { \g_problem_ID_int } \l_problem_source_show_tl
   \prop_get:NVN \g_problem_difficulty_prop { \g_problem_ID_int } \l_problem_diff_show_tl
-  
-  \IfVideoTF { } {
-    \prop_if_empty:NTF \g_how_many_solutions_each_problem_prop {
-      \prop_if_empty:NTF \g_how_many_hint_each_problem_prop {
-        \setlist[problemlist]{%
-          label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_number_box:n {\theproblemnumber}},
+
+  \prop_if_empty:NTF \g_how_many_solutions_each_problem_prop {
+    \prop_if_empty:NTF \g_how_many_hint_each_problem_prop {
+      \setlist[problemlist]{%
+        label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_number_box:n {\theproblemnumber}},
         % label={\mj_problem_number_box:n {\theproblemnumber} },
         % label=\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}},
-          ref=\theproblemnumber,
-          partopsep=0.125\baselineskip,
-          topsep=0.125\baselineskip,
-          itemsep=2.5ex,
-          leftmargin=*,
-        }
-        \advanceenumeratelevel
-        \begin{problemlist}
-          \item \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
-          \end{problemlist}
-          \retractenumeratelevel
-          \vfil\penalty-101\vfilneg
-        } {
-          \prop_if_in:NVTF \g_how_many_hint_each_problem_prop { \g_problem_ID_int } {
-            \prop_get:NVN \g_how_many_hint_each_problem_prop { \g_problem_ID_int } \l_hint_number_per_problem_tl
-            \int_compare:nNnTF { \l_hint_number_per_problem_tl } > { 0 } {
-              \prop_if_empty:NTF \g_hint_mapping_prop { } {%
-                \setlist[problemlist]{%
-                  label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_number_box:n {\theproblemnumber}},
-              % label={\mj_problem_number_box:n {\theproblemnumber} },
-              % label=\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}},
-                  ref=\theproblemnumber,
-                  partopsep=0.125\baselineskip,
-                  topsep=0.125\baselineskip,
-                  itemsep=2.5ex,
-                  leftmargin=*,
-                }
-                \hypertarget{hyperproblem:\int_use:N \g_problem_ID_int}{}%
-                \advanceenumeratelevel
-                \begin{problemlist}
-                \item \int_step_inline:nn { \l_hint_number_per_problem_tl } {
-                    \prop_get:NeN \g_hint_mapping_prop { \int_eval:n { \g_problem_ID_int * 10 + ##1 } } \l_hint_number_after_shuffle_tl
-                    \hbuttonPP{\tl_use:N \l_hint_number_after_shuffle_tl}{##1}
-                  } \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\HintToggleThisProblem\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
-                \end{problemlist}
-                \retractenumeratelevel
-                \vfil\penalty-101\vfilneg
-              }
-            } {  }
-          } {
+        ref=\theproblemnumber,
+        partopsep=0.125\baselineskip,
+        topsep=0.125\baselineskip,
+        itemsep=2.5ex,
+        leftmargin=*,
+      }
+      \advanceenumeratelevel
+      \begin{problemlist}
+        \item \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
+      \end{problemlist}
+      \retractenumeratelevel
+      \vfil\penalty-101\vfilneg
+    } {
+      \prop_if_in:NVTF \g_how_many_hint_each_problem_prop { \g_problem_ID_int } {
+        \prop_get:NVN \g_how_many_hint_each_problem_prop { \g_problem_ID_int } \l_hint_number_per_problem_tl
+        \int_compare:nNnTF { \l_hint_number_per_problem_tl } > { 0 } {
+          \prop_if_empty:NTF \g_hint_mapping_prop { } {%
             \setlist[problemlist]{%
               label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_number_box:n {\theproblemnumber}},
-          % label={\mj_problem_number_box:n {\theproblemnumber} },
-          % label=\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}},
-              ref=\theproblemnumber,
-              partopsep=0.125\baselineskip,
-              topsep=0.125\baselineskip,
-              itemsep=2.5ex,
-              leftmargin=*,
-            }
-            \advanceenumeratelevel
-            \begin{problemlist}
-            \item \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
-            \end{problemlist}
-            \retractenumeratelevel
-            \vfil\penalty-101\vfilneg
-          }
-        }
-      } {
-        \prop_if_in:NVTF \g_how_many_solutions_each_problem_prop { \g_problem_ID_int } {
-          \prop_if_empty:NTF \g_how_many_hint_each_problem_prop {
-            \setlist[problemlist]{%
-              label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_label:},
-          % label={\mj_problem_label:},
-          % label=\protect\hyperlink{hypersolution:\int_use:N \g_problem_ID_int}{\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}}},
+              % label={\mj_problem_number_box:n {\theproblemnumber} },
+              % label=\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}},
               ref=\theproblemnumber,
               partopsep=0.125\baselineskip,
               topsep=0.125\baselineskip,
@@ -1684,44 +1639,64 @@
             \hypertarget{hyperproblem:\int_use:N \g_problem_ID_int}{}%
             \advanceenumeratelevel
             \begin{problemlist}
-            \item \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
+            \item \int_step_inline:nn { \l_hint_number_per_problem_tl } {
+                \prop_get:NeN \g_hint_mapping_prop { \int_eval:n { \g_problem_ID_int * 10 + ##1 } } \l_hint_number_after_shuffle_tl
+                \hbuttonPP{\tl_use:N \l_hint_number_after_shuffle_tl}{##1}
+              } \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\HintToggleThisProblem\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
             \end{problemlist}
             \retractenumeratelevel
             \vfil\penalty-101\vfilneg
-          } {
-            \prop_if_in:NVTF \g_how_many_hint_each_problem_prop { \g_problem_ID_int } {
-              \prop_get:NVN \g_how_many_hint_each_problem_prop { \g_problem_ID_int } \l_hint_number_per_problem_tl
-              \int_compare:nNnTF { \l_hint_number_per_problem_tl } > { 0 } {
-                \prop_if_empty:NTF \g_hint_mapping_prop { } {%
-                  \prop_get:NVNTF \g_mj_fav_problem_prop { \g_problem_ID_int } \l_tmpa_tl { \tl_if_eq:VnTF \l_tmpa_tl { true } {\bool_gset_true:N \g_mj_fav_problem_bool}{\bool_gset_false:N \g_mj_fav_problem_bool} } { \bool_gset_false:N \g_mj_fav_problem_bool }
-                  \setlist[problemlist]{%
-                    label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_label:},
-                % label={\mj_problem_label:},
-                % label=\protect\hyperlink{hypersolution:\int_use:N \g_problem_ID_int}{\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}}},
-                    ref=\theproblemnumber,
-                    partopsep=0.125\baselineskip,
-                    topsep=0.125\baselineskip,
-                    itemsep=2.5ex,
-                    leftmargin=*,
-                  }
-                  \hypertarget{hyperproblem:\int_use:N \g_problem_ID_int}{}%
-                  \advanceenumeratelevel
-                  \begin{problemlist}
-                  \item \int_step_inline:nn { \l_hint_number_per_problem_tl } {
-                      \prop_get:NeN \g_hint_mapping_prop { \int_eval:n { \g_problem_ID_int * 10 + ##1 } } \l_hint_number_after_shuffle_tl
-                      \hbuttonPP{\tl_use:N \l_hint_number_after_shuffle_tl}{##1}
-                    } \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\HintToggleThisProblem\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
-                  \end{problemlist}
-                  \retractenumeratelevel
-                  \vfil\penalty-101\vfilneg
-                }
-              } {  }
-            } {
+          }
+        } {  }
+      } {
+        \setlist[problemlist]{%
+          label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_number_box:n {\theproblemnumber}},
+          % label={\mj_problem_number_box:n {\theproblemnumber} },
+          % label=\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}},
+          ref=\theproblemnumber,
+          partopsep=0.125\baselineskip,
+          topsep=0.125\baselineskip,
+          itemsep=2.5ex,
+          leftmargin=*,
+        }
+        \advanceenumeratelevel
+        \begin{problemlist}
+          \item \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
+        \end{problemlist}
+        \retractenumeratelevel
+        \vfil\penalty-101\vfilneg
+      }
+    }
+  } {
+    \prop_if_in:NVTF \g_how_many_solutions_each_problem_prop { \g_problem_ID_int } {
+      \prop_if_empty:NTF \g_how_many_hint_each_problem_prop {
+        \setlist[problemlist]{%
+          label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_label:},
+          % label={\mj_problem_label:},
+          % label=\protect\hyperlink{hypersolution:\int_use:N \g_problem_ID_int}{\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}}},
+          ref=\theproblemnumber,
+          partopsep=0.125\baselineskip,
+          topsep=0.125\baselineskip,
+          itemsep=2.5ex,
+          leftmargin=*,
+        }
+        \hypertarget{hyperproblem:\int_use:N \g_problem_ID_int}{}%
+        \advanceenumeratelevel
+        \begin{problemlist}
+        \item \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
+        \end{problemlist}
+        \retractenumeratelevel
+        \vfil\penalty-101\vfilneg
+      } {
+        \prop_if_in:NVTF \g_how_many_hint_each_problem_prop { \g_problem_ID_int } {
+          \prop_get:NVN \g_how_many_hint_each_problem_prop { \g_problem_ID_int } \l_hint_number_per_problem_tl
+          \int_compare:nNnTF { \l_hint_number_per_problem_tl } > { 0 } {
+            \prop_if_empty:NTF \g_hint_mapping_prop { } {%
               \prop_get:NVNTF \g_mj_fav_problem_prop { \g_problem_ID_int } \l_tmpa_tl { \tl_if_eq:VnTF \l_tmpa_tl { true } {\bool_gset_true:N \g_mj_fav_problem_bool}{\bool_gset_false:N \g_mj_fav_problem_bool} } { \bool_gset_false:N \g_mj_fav_problem_bool }
               \setlist[problemlist]{%
                 label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_label:},
-            % label={\mj_problem_label:},
-            % label=\protect\hyperlink{hypersolution:\int_use:N \g_problem_ID_int}{\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}}},
+                % label={\mj_problem_label:},
+                % label=\protect\hyperlink{hypersolution:\int_use:N \g_problem_ID_int}{\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}}},
                 ref=\theproblemnumber,
                 partopsep=0.125\baselineskip,
                 topsep=0.125\baselineskip,
@@ -1731,78 +1706,101 @@
               \hypertarget{hyperproblem:\int_use:N \g_problem_ID_int}{}%
               \advanceenumeratelevel
               \begin{problemlist}
-              \item \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
+              \item \int_step_inline:nn { \l_hint_number_per_problem_tl } {
+                  \prop_get:NeN \g_hint_mapping_prop { \int_eval:n { \g_problem_ID_int * 10 + ##1 } } \l_hint_number_after_shuffle_tl
+                  \hbuttonPP{\tl_use:N \l_hint_number_after_shuffle_tl}{##1}
+                } \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\HintToggleThisProblem\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
               \end{problemlist}
               \retractenumeratelevel
               \vfil\penalty-101\vfilneg
             }
-          }
+          } {  }
         } {
-          \prop_if_empty:NTF \g_how_many_hint_each_problem_prop {
-            \setlist[problemlist]{%
-              label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_number_box:n {\theproblemnumber}},
+          \prop_get:NVNTF \g_mj_fav_problem_prop { \g_problem_ID_int } \l_tmpa_tl { \tl_if_eq:VnTF \l_tmpa_tl { true } {\bool_gset_true:N \g_mj_fav_problem_bool}{\bool_gset_false:N \g_mj_fav_problem_bool} } { \bool_gset_false:N \g_mj_fav_problem_bool }
+          \setlist[problemlist]{%
+            label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_label:},
+            % label={\mj_problem_label:},
+            % label=\protect\hyperlink{hypersolution:\int_use:N \g_problem_ID_int}{\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}}},
+            ref=\theproblemnumber,
+            partopsep=0.125\baselineskip,
+            topsep=0.125\baselineskip,
+            itemsep=2.5ex,
+            leftmargin=*,
+          }
+          \hypertarget{hyperproblem:\int_use:N \g_problem_ID_int}{}%
+          \advanceenumeratelevel
+          \begin{problemlist}
+            \item \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
+          \end{problemlist}
+          \retractenumeratelevel
+          \vfil\penalty-101\vfilneg
+        }
+      }
+    } {
+      \prop_if_empty:NTF \g_how_many_hint_each_problem_prop {
+        \setlist[problemlist]{%
+          label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_number_box:n {\theproblemnumber}},
           % label={\mj_problem_number_box:n {\theproblemnumber} },
           % label=\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}},
-              ref=\theproblemnumber,
-              partopsep=0.125\baselineskip,
-              topsep=0.125\baselineskip,
-              itemsep=2.5ex,
-              leftmargin=*,
-            }
-            \advanceenumeratelevel
-            \begin{problemlist}
-            \item \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
-            \end{problemlist}
-            \retractenumeratelevel
-            \vfil\penalty-101\vfilneg
-          } {
-            \prop_if_in:NVTF \g_how_many_hint_each_problem_prop { \g_problem_ID_int } {
-              \prop_get:NVN \g_how_many_hint_each_problem_prop { \g_problem_ID_int } \l_hint_number_per_problem_tl
-              \int_compare:nNnTF { \l_hint_number_per_problem_tl } > { 0 } {
-                \prop_if_empty:NTF \g_hint_mapping_prop { } {%
-                  \setlist[problemlist]{%
-                    label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_number_box:n {\theproblemnumber}},
-                % label={\mj_problem_number_box:n {\theproblemnumber} },
-                % label=\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}},
-                    ref=\theproblemnumber,
-                    partopsep=0.125\baselineskip,
-                    topsep=0.125\baselineskip,
-                    itemsep=2.5ex,
-                    leftmargin=*,
-                  }
-                  \hypertarget{hyperproblem:\int_use:N \g_problem_ID_int}{}%
-                  \advanceenumeratelevel
-                  \begin{problemlist}
-                  \item \int_step_inline:nn { \l_hint_number_per_problem_tl } {
-                      \prop_get:NeN \g_hint_mapping_prop { \int_eval:n { \g_problem_ID_int * 10 + ##1 } } \l_hint_number_after_shuffle_tl
-                      \hbuttonPP{\tl_use:N \l_hint_number_after_shuffle_tl}{##1}
-                    } \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\HintToggleThisProblem\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
-                  \end{problemlist}
-                  \retractenumeratelevel
-                  \vfil\penalty-101\vfilneg
-                }
-              } {  }
-            } {
+          ref=\theproblemnumber,
+          partopsep=0.125\baselineskip,
+          topsep=0.125\baselineskip,
+          itemsep=2.5ex,
+          leftmargin=*,
+        }
+        \advanceenumeratelevel
+        \begin{problemlist}
+          \item \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
+        \end{problemlist}
+        \retractenumeratelevel
+        \vfil\penalty-101\vfilneg
+      } {
+        \prop_if_in:NVTF \g_how_many_hint_each_problem_prop { \g_problem_ID_int } {
+          \prop_get:NVN \g_how_many_hint_each_problem_prop { \g_problem_ID_int } \l_hint_number_per_problem_tl
+          \int_compare:nNnTF { \l_hint_number_per_problem_tl } > { 0 } {
+            \prop_if_empty:NTF \g_hint_mapping_prop { } {%
               \setlist[problemlist]{%
                 label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_number_box:n {\theproblemnumber}},
-            % label={\mj_problem_number_box:n {\theproblemnumber} },
-            % label=\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}},
+                % label={\mj_problem_number_box:n {\theproblemnumber} },
+                % label=\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}},
                 ref=\theproblemnumber,
                 partopsep=0.125\baselineskip,
                 topsep=0.125\baselineskip,
                 itemsep=2.5ex,
                 leftmargin=*,
               }
+              \hypertarget{hyperproblem:\int_use:N \g_problem_ID_int}{}%
               \advanceenumeratelevel
               \begin{problemlist}
-              \item \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
+              \item \int_step_inline:nn { \l_hint_number_per_problem_tl } {
+                  \prop_get:NeN \g_hint_mapping_prop { \int_eval:n { \g_problem_ID_int * 10 + ##1 } } \l_hint_number_after_shuffle_tl
+                  \hbuttonPP{\tl_use:N \l_hint_number_after_shuffle_tl}{##1}
+                } \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\HintToggleThisProblem\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
               \end{problemlist}
               \retractenumeratelevel
               \vfil\penalty-101\vfilneg
             }
+          } {  }
+        } {
+          \setlist[problemlist]{%
+            label=\ProblemNumberWithSourceAndDiffIcons{\mj_problem_number_box:n {\theproblemnumber}},
+            % label={\mj_problem_number_box:n {\theproblemnumber} },
+            % label=\mytcbfitproblem{\color{pntxt}\textbf{\sffamily\theproblemnumber}},
+            ref=\theproblemnumber,
+            partopsep=0.125\baselineskip,
+            topsep=0.125\baselineskip,
+            itemsep=2.5ex,
+            leftmargin=*,
           }
+          \advanceenumeratelevel
+          \begin{problemlist}
+            \item \SourceToggleThisProblem{\tl_use:N \l_problem_source_show_tl}\DifficultyToggleThisProblem{\tl_use:N \l_problem_diff_show_tl}#2
+          \end{problemlist}
+          \retractenumeratelevel
+          \vfil\penalty-101\vfilneg
         }
       }
+    }
   }
 } {  }
 
@@ -1949,24 +1947,22 @@
       \item \l_problem_statement_tl \par
       \end{solutionlist}
       \retractenumeratelevel%
-      \vspace{2cm}
       \tl_if_empty:NTF \l_problem_source_tl {
         \tl_if_empty:NTF \l_problem_proposer_tl { } {
-          \begin{flushright}\textsl{\color{c1}Proposed \space by \space \l_problem_proposer_tl}\end{flushright}
+          \begin{flushright}\textit{\color{c1}(Proposed \space by \space \l_problem_proposer_tl)}\end{flushright}
           \vspace*{-0.5\baselineskip}
         }
       } {
         \tl_if_empty:NTF \l_problem_proposer_tl {
-          \begin{flushright}\textsl{\color{c1}\l_problem_source_tl}\end{flushright}%
+          \begin{flushright}\textit{\color{c1}(\l_problem_source_tl)}\end{flushright}%
           \vspace*{-0.5\baselineskip}
         } {
-          \begin{flushright}\textsl{\color{c1}Proposed \space by \space \textbf{\l_problem_proposer_tl}}\end{flushright}
-          \begin{flushright}\textsl{\color{c1}\l_problem_source_tl}\end{flushright}
+          \begin{flushright}\textit{\color{c1}(Proposed \space by \space \l_problem_proposer_tl, \space \l_problem_source_tl)}\end{flushright}
           \vspace*{-0.5\baselineskip}
         }
       }
       % \vspace*{-0.5\baselineskip}
-      % \noindent{\color{c2}\dotfill}
+      \noindent{\color{c2}\dotfill}
     }{ }
     
     \tl_if_empty:NTF \l_solver_tl { } {
@@ -1981,11 +1977,9 @@
     }
 
     \int_compare:nNnTF { \l_solution_count_int } = {1} {
-      \newpage
       \pagebreak[1]\par\noindent\l_aops_link_done_tl\textbf{\sffamily\small\hspace*{2em}\textcolor{ \g_cthree_color_correction_str }{SOLUSI \space \faGg} \space \l_solver_tl \hspace*{1em}} \l_solution_body_tl \newpage
       % \vfil\penalty-101\vfilneg
     }{
-      \newpage
       \pagebreak[1]\par\noindent\l_aops_link_done_tl\textbf{\sffamily\small\hspace*{2em}\textcolor{ \g_cthree_color_correction_str }{SOLUSI \space \l_nth_solution_of_the_problem_tl \space \faGg} \space \l_solver_tl \hspace*{1em}} \l_solution_body_tl \hfill \(\color{ \g_cthree_color_correction_str }{\blacksquare}\) \par
       \int_compare:nNnTF { \l_nth_solution_of_the_problem_tl } = { \l_solution_count_int } {
         \ornamentbig{\g_cthree_color_correction_str} \newpage
